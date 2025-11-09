@@ -66,10 +66,10 @@ function h = drawFrameAndPoint(p1, R, p2, len, ax)
         pg = P_global(i,:);
         hPts(i) = plot3(ax, pg(1), pg(2), pg(3), 'ko', ...
                         'MarkerFaceColor','y', 'MarkerSize',8);
-        % 连线（可选）：从局部原点到该点的虚线
+        % 连线：从局部原点到该点的实线
+        randColor = rand(1,3);  % 生成 0~1 之间的 RGB
         line(ax, [p1(1) pg(1)], [p1(2) pg(2)], [p1(3) pg(3)], ...
-             'LineStyle','--', 'Color',[0.3 0.3 0.3], 'LineWidth',1);
-
+             'LineStyle','-', 'Color', randColor, 'LineWidth',1.2)
         % 文字标注
         text(ax, pg(1), pg(2), pg(3), ['  ' defaultLabels{i}], ...
              'Color','k', 'FontWeight','bold', ...
