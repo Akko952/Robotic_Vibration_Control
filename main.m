@@ -19,10 +19,18 @@ x(1)=5;
 x(3)=3;
 x(4)=5;
 %Q1是一个时变信号，为广义坐标，但可以有初始值，定义为：
-x(5)=0*pi/180;
+x(5)=10*pi/180;
 %定义D初始值
 x(19)=10;
 % 根据此可以迭代算出初始条件下，
 % 满足几何约束的初始情况值？
-TheIterativeMethodForSolvingTheRoots(x);
+% 迭代求解满足几何约束的 L2, Q2, s, Q3
+[L2,Q2,s,Q3] = TheIterativeMethodForSolvingTheRoots(x);
+
+% 将结果写回 x，供后续运动学计算
+x(2)  = L2;
+x(8)  = Q2;
+x(11) = Q3;
+x(14) = s;
+
 % MechanicalMechanics_Kinematics(x);

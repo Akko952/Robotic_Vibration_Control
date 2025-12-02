@@ -1,4 +1,4 @@
-function Inition=TheIterativeMethodForSolvingTheRoots(x)
+function [L2,Q2,s,Q3]=TheIterativeMethodForSolvingTheRoots(x)
 
 L1=x(1);%L2=x(2);
 L3=x(3);L4=x(4);
@@ -10,8 +10,8 @@ Q1=x(5);%dQ1=x(6);ddQ1=x(7);
 D=x(19);
 
 %猜测Q2、Q3、L2、s的初始值
-Q2_guess=0*pi/180;
-Q3_guess=30*pi/180;
+Q2_guess=5*pi/180;
+Q3_guess=20*pi/180;
 L2_guess=15;
 s_guess=4;
 Inition=[L2_guess,Q2_guess,s_guess,Q3_guess];
@@ -30,7 +30,7 @@ Inition=[L2_guess,Q2_guess,s_guess,Q3_guess];
 % GeometricConstraintsMatrix=[GeoMetric_F_1;GeoMetric_F_2;GeoMetric_F_3;GeoMetric_F_4];
 
 %检查敛散性,迭代参数设置
-max_iter = 10;
+max_iter = 100;
 tolerance=1e-6;
 
 
