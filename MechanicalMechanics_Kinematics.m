@@ -1,0 +1,15 @@
+function y=MechanicalMechanics_Kinematics(x)
+L1=x(1);L2=x(2);L3=x(3);L4=x(4);
+Q1=x(5);dQ1=x(6);ddQ1=x(7);
+Q2=x(8);dQ2=x(9);ddQ2=x(10);
+Q3=x(11);dQ3=x(12);ddQ3=x(13);
+s=x(14);ds=x(15);dds=x(16);
+dL2=x(17);ddL2=x(18);
+A=[sin(Q2),L2*cos(Q2),0,0;
+    cos(Q2),L2*sin(Q2),0,0;
+    0,L3*cos(Q2),1,L4*sin(Q3);
+    0,L3*sin(Q2),0,L4*cos(Q3)
+];
+b=[L1*cos(Q1);-L1*sin(Q1);0;0]*dQ1;
+y=inv(A)*b;
+end
