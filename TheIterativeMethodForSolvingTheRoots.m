@@ -53,13 +53,13 @@ D+(L1)*cos(Q1)-(L2_curr)*cos(Q2_curr);
 
 %建立数值雅可比矩阵
 % Jacob=[(L1)*cos(Q1),-(L2)*cos(Q2),0,0;
-%         -(L1)*sin(Q1),(L2)*sin(Q2),0,0;
+%         -(L1)*sin(Q1),(L2)*cos(Q2),0,0;
 %         0,-(L3)*cos(Q2),-1,-(L4)*sin(Q3);
 %         0,(L3)*sin(Q2),0,(L4)*cos(Q3)
 % ];%Q1、Q2、s、Q3
 
 Jacob=[-sin(Q2_curr),-(L2_curr)*cos(Q2_curr),0,0;
-        sin(Q2_curr),(L2_curr)*sin(Q2_curr),0,0;
+        -cos(Q2_curr),(L2_curr)*sin(Q2_curr),0,0;
         0,-(L3)*cos(Q2_curr),-1,-(L4)*sin(Q3_curr);
         0,(L3)*sin(Q2_curr),0,(L4)*cos(Q3_curr)
 ];%L2、Q2、s、Q3
