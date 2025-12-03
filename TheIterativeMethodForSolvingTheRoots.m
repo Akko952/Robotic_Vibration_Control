@@ -10,7 +10,7 @@ Q1=x(5);%dQ1=x(6);ddQ1=x(7);
 D=x(19);
 
 %猜测Q2、Q3、L2、s的初始值
-Q2_guess=5*pi/180;
+Q2_guess=10*pi/180;
 Q3_guess=20*pi/180;
 L2_guess=15;
 s_guess=4;
@@ -72,16 +72,12 @@ if norm(GeometricConstraintsMatrixIntial) < tolerance
     s=Inition(3);
     Q3=Inition(4);
     % % 输出结果
-    fprintf('结果: L2 = %.4f m\n , Q2=%.4f rad\n,s = %.4f\n,Q3= %.4f\n ', ...
+    fprintf('结果: L2 = %.4f m , Q2=%.4f rad,s = %.4f,Q3= %.4f\n ', ...
          L2, Q2, s,Q3);
-
-    % % 验证结果是否正确 (代回方程)
-    % check_val = L1*sin(theta1) - L2*sin(theta2);
-    % fprintf('验证 f2 (应接近0): %.4e\n', check_val);
     return;
 end
 
-delta = Jacob \ GeometricConstraintsMatrixIntial;
+delta = -Jacob \ GeometricConstraintsMatrixIntial;
 Inition = Inition + delta;
 end
 
