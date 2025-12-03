@@ -13,13 +13,13 @@ x = zeros(19,1);
 % GeoMetric_F_3=@(Q3,s,Q2)(L4)*Cos(Q3)-(L3)*Sin(Q2)-s;
 % GeoMetric_F_4=@(Q3,Q2)(L4)*Sin(Q3)-(L3)*Cos(Q2);
 % GeometricConstraintsMatrix=[GeoMetric_F_1;GeoMetric_F_2;GeoMetric_F_3;GeoMetric_F_4];
-%定义初始值
+%定义.初始值
 x(1)=5;
 %x(2)是一个时变信号，待求初始值
 x(3)=3;
 x(4)=5;
 %Q1是一个时变信号，为广义坐标，但可以有初始值，定义为：
-x(5)=0*pi/180;
+x(5)=120*pi/-180;
 %定义D初始值
 x(19)=10;
 % 根据此可以迭代算出初始条件下，
@@ -45,4 +45,8 @@ fprintf('验证 f1 (应接近0): %.4e\n', check_val_1);
 fprintf('验证 f2 (应接近0): %.4e\n', check_val_2);
 fprintf('验证 f3 (应接近0): %.4e\n', check_val_3);
 fprintf('验证 f4 (应接近0): %.4e\n', check_val_4);
+
+GenerateSimplifiedMechanism(x);
+
+
 % MechanicalMechanics_Kinematics(x);
