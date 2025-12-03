@@ -5,18 +5,18 @@ Q1 = x(5); Q2 = x(8); Q3 = x(11);
 s  = x(14); D  = x(19);
 
 %设置基点（转轴R1和R3）
-O_R1=[0,0];
-O_R3=[0,D];
+O_R1=[0,-D];
+O_R3=[0,0];
 
 % 单位方向
 u1 = [sin(Q1), cos(Q1)];   % 相对 y 轴角 Q1
 u2 = [sin(Q2), cos(Q2)];   % 相对 y 轴角 Q2
-u4 = [cos(Q3), sin(Q3)];   % 相对 x 轴角 Q3
+u4 = [cos(Q3), -sin(Q3)];   % 相对 x 轴角 Q3
 
 %确定相对位置
 P01=O_R3+L1*u1;
 P12=O_R1+L2*u2;
-P23=O_R1-L3*u2;
+P23=O_R1+L3*u2;
 P34=P23+L4*u4;
 
 
@@ -41,10 +41,8 @@ plot([P34(1), P23(1)], [P34(2), P23(2)], 'LineWidth',2, 'Color',[0.49 0.18 0.56]
 % 关键点标注
 scatter(O_R3(1),O_R3(2),50,'k','filled'); text(O_R3(1),O_R3(2),'  R3')
 scatter(O_R1(1),O_R1(2),50,'k','filled'); text(O_R1(1),O_R1(2),'  R1')
-% scatter(P01(1),P01(2),50,'k','filled'); text(P01(1),P01(2),'  P_{01}')
-% scatter(P01(1),P01(2),50,'k','filled'); text(P01(1),P01(2),'  P_{01}')
-% scatter(P01(1),P01(2),50,'k','filled'); text(P01(1),P01(2),'  P_{01}');
-% scatter(P12(1),P12(2),50,'k','filled'); text(P12(1),P12(2),'  P_{12}');
-% scatter(T4(1),T4(2),50,'k','filled');  text(T4(1),T4(2),'  T_4');
-% scatter(S4(1),S4(2),50,'k','filled');  text(S4(1),S4(2),'  S_4');
+scatter(P01(1),P01(2),50,'k','filled');   text(P01(1),P01(2),'  P_{01}');
+scatter(P12(1),P12(2),50,'k','filled');   text(P12(1),P12(2),'  P_{12}');
+scatter(P23(1),P23(2),50,'k','filled');   text(P23(1),P23(2),'  P_{23}');
+scatter(P34(1),P34(2),50,'k','filled');   text(P34(1),P34(2),'  P_{34}');
 end
