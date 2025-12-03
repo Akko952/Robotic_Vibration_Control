@@ -30,7 +30,7 @@ Inition=[L2_guess,Q2_guess,s_guess,Q3_guess];
 % GeometricConstraintsMatrix=[GeoMetric_F_1;GeoMetric_F_2;GeoMetric_F_3;GeoMetric_F_4];
 
 %检查敛散性,迭代参数设置
-max_iter = 100;
+max_iter = 1000;
 tolerance=1e-6;
 
 
@@ -81,7 +81,7 @@ if norm(GeometricConstraintsMatrixIntial) < tolerance
     return;
 end
 
-delta = -Jacob \ GeometricConstraintsMatrixIntial;
+delta = Jacob \ GeometricConstraintsMatrixIntial;
 Inition = Inition + delta;
 end
 
