@@ -1,4 +1,4 @@
-function [dL2,dQ2,ds,dQ3]=MechanicalMechanics_Kinematics(x)
+function [dL2;dQ2;ds;dQ3]=MechanicalMechanics_Kinematics(x)
 L1=x(1);L2=x(2);L3=x(3);L4=x(4);
 Q1=x(5);dQ1=x(6);ddQ1=x(7);
 Q2=x(8);dQ2=x(9);ddQ2=x(10);
@@ -11,9 +11,5 @@ A=[sin(Q2),L2*cos(Q2),0,0;
     0,L3*sin(Q2),0,L4*cos(Q3)
 ];
 b=[L1*cos(Q1);-L1*sin(Q1);0;0]*dQ1;
-y=-A\b;%[dL2;dQ2;ds;dQ3]
-dL2=y(1);
-dQ2=y(2);
-ds=y(3);
-dQ3=y(4);
+[dL2;dQ2;ds;dQ3]=-A\b;%[dL2;dQ2;ds;dQ3]
 end

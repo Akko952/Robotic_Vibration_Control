@@ -19,12 +19,13 @@ x(1)=5;
 x(3)=3;
 x(4)=5;
 %Q1是一个时变信号，为广义坐标，但可以有初始值，定义为：
-x(5)=120*pi/-180;
+x(5)=90*pi/-180;
 %定义D初始值
 x(19)=10;
 % 根据此可以迭代算出初始条件下，
 % 满足几何约束的初始情况值？
 % 迭代求解满足几何约束的 L2, Q2, s, Q3
+
 [L2,Q2,s,Q3] = TheIterativeMethodForSolvingTheRoots(x);
 
 % 将结果写回 x，供后续运动学计算
@@ -47,6 +48,10 @@ fprintf('验证 f3 (应接近0): %.4e\n', check_val_3);
 fprintf('验证 f4 (应接近0): %.4e\n', check_val_4);
 
 GenerateSimplifiedMechanism(x);
-
-
-% MechanicalMechanics_Kinematics(x);
+%做出图像，验证结果
+%完成初值求解
+%开始运动学迭代
+%设置初始角速度dQ1
+dQ1=1*pi/-180;
+x(6)=dQ1;
+%[dL2,dQ2,ds,dQ3]=MechanicalMechanics_Kinematics(x);
