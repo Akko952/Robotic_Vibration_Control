@@ -1,3 +1,5 @@
+x = out.simout_x(end, :)'; 
+
 L1=x(1);L2=x(2);
 L3=x(3);L4=x(4);
 Q1=x(5);dQ1=x(6);ddQ1=x(7);
