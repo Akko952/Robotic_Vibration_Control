@@ -52,6 +52,6 @@ GenerateSimplifiedMechanism(x);
 %完成初值求解
 %开始运动学迭代
 %设置初始角速度dQ1
-dQ1=1*pi/-180;
+dQ1=10*pi/-180;
 x(6)=dQ1;
 %[dL2,dQ2,ds,dQ3]=MechanicalMechanics_Kinematics(x);

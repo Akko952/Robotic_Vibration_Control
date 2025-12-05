@@ -5,7 +5,7 @@ Q2=x(8);dQ2=x(9);ddQ2=x(10);
 Q3=x(11);dQ3=x(12);ddQ3=x(13);
 s=x(14);ds=x(15);dds=x(16);
 dL2=x(17);ddL2=x(18);
-
+D=x(19);
 
 A=[sin(Q2),L2*cos(Q2),0,0;
     cos(Q2),-L2*sin(Q2),0,0;
