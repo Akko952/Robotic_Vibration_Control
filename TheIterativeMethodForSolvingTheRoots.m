@@ -31,7 +31,7 @@ Inition=[L2_guess,Q2_guess,s_guess,Q3_guess];
 
 %检查敛散性,迭代参数设置
 max_iter = 100;
-tolerance=1e-6;
+tolerance=1e-9;
 
 
 for iter = 1:max_iter
