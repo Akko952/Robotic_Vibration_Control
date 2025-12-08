@@ -51,10 +51,11 @@ GenerateSimplifiedMechanism(x);
 %做出图像，验证结果
 %完成初值求解
 %开始运动学迭代
-%设置初始角速度dQ1
-dQ1=5*pi/-180;
+%设置初始角加速度ddQ1
+%dQ1=5*pi/-180;
+
 ddQ1=5*pi/-180;
-x(6)=dQ1;
+%x(6)=dQ1;
 
 
 % %调用simulink
