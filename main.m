@@ -52,6 +52,19 @@ GenerateSimplifiedMechanism(x);
 %完成初值求解
 %开始运动学迭代
 %设置初始角速度dQ1
-dQ1=10*pi/-180;
+dQ1=5*pi/-180;
+ddQ1=5*pi/-180;
 x(6)=dQ1;
-%[dL2,dQ2,ds,dQ3]=MechanicalMechanics_Kinematics(x);
+
+
+% %调用simulink
+% out= sim('Kinematic.slx', 'StopTime', '10');
+% 
+% %再绘图并验证
+% Correct_new_data;
+
+%调用simulink
+out= sim('Dynamic.slx', 'StopTime', '10');
+
+%再绘图并验证
+Correct_new_data;
