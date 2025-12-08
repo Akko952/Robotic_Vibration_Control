@@ -22,7 +22,7 @@ A_2=[sin(Q2),L2*cos(Q2),0,0;
 
 
 b_1=[L1*cos(Q1);-L1*sin(Q1);0;0]*ddQ1;
-b_2=[-L1*sin(Q1);-L1*cos(Q1);0;0]*dQ1;
+b_2=[-L1*sin(Q1);-L1*cos(Q1);0;0]*dQ1^2;
 
 b=(b_1+b_2)-A_1;
 
