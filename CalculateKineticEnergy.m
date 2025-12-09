@@ -1,0 +1,16 @@
+syms J1 M2 J2 J3 Jc4 M4 M5 
+syms M1 m2 M3 L1 L2 L3
+
+J1=1/3*M1*L1^2;
+J2=1/3*m2*L2^2;
+J3=1/3*M3*L3^2;
+Jc4=1/3*M4*L4^2;
+
+T_all = 1/2*J1*dQ1^2 ...
+      + 1/2*M2*(dQ1*L1)^2 ...
+      + 1/2*(J2+J3)*SYMS_dQ2^2 ...    
+      + 1/2*(3/2*Jc4)*SYMS_dQ3^2 ...  
+      + 1/2*M4*SYMS_ds^2 ...         
+      + 1/2*M5*SYMS_ds^2;
+
+T_all = simplify(T_all);
