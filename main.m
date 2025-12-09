@@ -13,6 +13,11 @@ x = zeros(19,1);
 % GeoMetric_F_3=@(Q3,s,Q2)(L4)*Cos(Q3)-(L3)*Sin(Q2)-s;
 % GeoMetric_F_4=@(Q3,Q2)(L4)*Sin(Q3)-(L3)*Cos(Q2);
 % GeometricConstraintsMatrix=[GeoMetric_F_1;GeoMetric_F_2;GeoMetric_F_3;GeoMetric_F_4];
+
+
+n=4;%约束方程个数
+
+
 %定义.初始值
 x(1)=5;
 %x(2)是一个时变信号，待求初始值

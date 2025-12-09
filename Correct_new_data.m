@@ -8,6 +8,7 @@ Q3=x(11);dQ3=x(12);ddQ3=x(13);
 s=x(14);ds=x(15);dds=x(16);
 dL2=x(17);ddL2=x(18);
 D=x(19);
+
 check_val_1 = L1*sin(Q1) - L2*sin(Q2);
 check_val_2 = D+L1*cos(Q1) - L2*cos(Q2);
 check_val_3= L4*cos(Q3) - L3*sin(Q2)-s;
