@@ -15,7 +15,7 @@ x = zeros(19,1);
 % GeometricConstraintsMatrix=[GeoMetric_F_1;GeoMetric_F_2;GeoMetric_F_3;GeoMetric_F_4];
 
 
-n=4;%约束方程个数
+%n=4;%约束方程个数
 
 
 %定义.初始值

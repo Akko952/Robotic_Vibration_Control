@@ -49,8 +49,18 @@ ddot_Phi = [
     + L3*(sin(Q2)*ddQ2 + cos(Q2)*dQ2^2)
 ];
 
-err_Phi=lg((sqrt(Phi'*Phi))/n);
-err_dotPhi=lg((sqrt(dot_Phi'*dot_Phi))/n);
+% 1. 防止除以0 (n如果没传或者是0)
+if nargin < 2 || n == 0
+    n = 4; % 默认约束方程个数
+end
+
+% 2. 计算模长，加上 eps 防止 log(0)
+norm_Phi = sqrt(Phi'*Phi);
+norm_dotPhi = sqrt(dot_Phi'*dot_Phi);
+
+% 使用 log10 替换 lg，并加入 eps 防止负无穷
+err_Phi = log10(norm_Phi/n + eps); 
+err_dotPhi = log10(norm_dotPhi/n + eps); 
 
 %定义计算误差、乘法函数
 err=1;
