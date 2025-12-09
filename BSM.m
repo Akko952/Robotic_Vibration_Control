@@ -16,38 +16,50 @@ dL2=x(17);ddL2=x(18);D=x(19);
 Phi=[ L1*sin(Q1) - L2*sin(Q2);
     D+L1*cos(Q1) - L2*cos(Q2);
     L4*cos(Q3) - L3*sin(Q2)-s;
-    L4*sin(Q3) - L3*cos(Q2);];
+    L4*sin(Q3) - L3*cos(Q2)];
 
 %dot_Phi为速度约束列向量
+% Jacob=[(L1)*cos(Q1),-(L2)*cos(Q2),0,0;
+%         -(L1)*sin(Q1),(L2)*cos(Q2),0,0;
+%         0,-(L3)*cos(Q2),-1,-(L4)*sin(Q3);
+%         0,(L3)*sin(Q2),0,(L4)*cos(Q3)
+% ];%Q1、Q2、s、Q3
 
-dot_Phi=[L1*cos(Q1)*dQ1-dL2*sin(Q2)-L2*cos(Q2)*dQ2;
-           -L1*sin(Q1)*dQ1-dL2*cos(Q2)+L2*sin(Q2)*dQ2;
-           -L4*sin(Q3)*dQ3-L3*cos(Q2)*dQ2-ds;
-           L4*cos(Q3)*dQ3+L3*sin(Q2)*dQ2];
+Jacob=[L1*cos(Q1),-sin(Q2),-(L2)*cos(Q2),0,0;
+        -L1*sin(Q1),-cos(Q2),(L2)*sin(Q2),0,0;
+        0,0,-(L3)*cos(Q2),-1,-(L4)*sin(Q3);
+        0,0,(L3)*sin(Q2),0,(L4)*cos(Q3)
+];%Q1、L2、Q2、s、Q3
 
+ % Phi_t=[L1*cos(Q1)*dQ1-dL2*sin(Q2)-L2*cos(Q2)*dQ2;
+ %            -L1*sin(Q1)*dQ1-dL2*cos(Q2)+L2*sin(Q2)*dQ2;
+ %            -L4*sin(Q3)*dQ3-L3*cos(Q2)*dQ2-ds;
+ %            L4*cos(Q3)*dQ3+L3*sin(Q2)*dQ2];
+Phi_t=zeros(4,1);
+dot_Phi=Jacob*[dQ1;dL2;dQ2;ds;dQ3]+Phi_t;
 
 %ddot_Phi为加速度约束列向量
 
-ddot_Phi = [
-    % 第 1 行
-    L1*(cos(Q1)*ddQ1 - sin(Q1)*dQ1^2) ...
-    - ddL2*sin(Q2) - 2*dL2*cos(Q2)*dQ2 ...
-    + L2*sin(Q2)*dQ2^2 - L2*cos(Q2)*ddQ2;
-    
-    % 第 2 行
-    -L1*(sin(Q1)*ddQ1 + cos(Q1)*dQ1^2) ...
-    - ddL2*cos(Q2) + 2*dL2*sin(Q2)*dQ2 ...
-    + L2*cos(Q2)*dQ2^2 + L2*sin(Q2)*ddQ2;
-    
-    % 第 3 行
-    -L4*(sin(Q3)*ddQ3 + cos(Q3)*dQ3^2) ...
-    - L3*(cos(Q2)*ddQ2 - sin(Q2)*dQ2^2) ...
-    - dds;
-    
-    % 第 4 行
-    L4*(cos(Q3)*ddQ3 - sin(Q3)*dQ3^2) ...
-    + L3*(sin(Q2)*ddQ2 + cos(Q2)*dQ2^2)
-];
+% ddot_Phi = [
+%     % 第 1 行
+%     L1*(cos(Q1)*ddQ1 - sin(Q1)*dQ1^2) ...
+%     - ddL2*sin(Q2) - 2*dL2*cos(Q2)*dQ2 ...
+%     + L2*sin(Q2)*dQ2^2 - L2*cos(Q2)*ddQ2;
+% 
+%     % 第 2 行
+%     -L1*(sin(Q1)*ddQ1 + cos(Q1)*dQ1^2) ...
+%     - ddL2*cos(Q2) + 2*dL2*sin(Q2)*dQ2 ...
+%     + L2*cos(Q2)*dQ2^2 + L2*sin(Q2)*ddQ2;
+% 
+%     % 第 3 行
+%     -L4*(sin(Q3)*ddQ3 + cos(Q3)*dQ3^2) ...
+%     - L3*(cos(Q2)*ddQ2 - sin(Q2)*dQ2^2) ...
+%     - dds;
+% 
+%     % 第 4 行
+%     L4*(cos(Q3)*ddQ3 - sin(Q3)*dQ3^2) ...
+%     + L3*(sin(Q2)*ddQ2 + cos(Q2)*dQ2^2)
+% ];
 
 % 1. 防止除以0 (n如果没传或者是0)
 if nargin < 2 || n == 0

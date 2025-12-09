@@ -6,10 +6,14 @@ Q3=x(11);dQ3=x(12);ddQ3=x(13);
 s=x(14);ds=x(15);dds=x(16);
 dL2=x(17);ddL2=x(18);D=x(19);
 
- % k=4;%定义约束数
- % [alpha,beta]=BSM(x,k);
- alpha=0.1;beta=sqrt(2)*0.1;
+  k=4;%定义约束数
+  [alpha,beta]=BSM(x,k);
+ %alpha=0.1;beta=sqrt(2)*0.1;
 % k1=alpha;k2=beta;
+
+% 防御性检查：防止 NaN 传入导致整个仿真崩溃
+if isnan(alpha) || isinf(alpha), alpha = 0; end
+if isnan(beta) || isinf(beta), beta = 0; end
 
 
 %相关定义
@@ -20,11 +24,16 @@ Phi=[ L1*sin(Q1) - L2*sin(Q2);
     L4*sin(Q3) - L3*cos(Q2);];
 
 %dot_Phi为速度约束列向量
+Jacob=[L1*cos(Q1),-sin(Q2),-(L2)*cos(Q2),0,0;
+        -L1*sin(Q1),-cos(Q2),(L2)*sin(Q2),0,0;
+        0,0,-(L3)*cos(Q2),-1,-(L4)*sin(Q3);
+        0,0,(L3)*sin(Q2),0,(L4)*cos(Q3)
+];%Q1、L2、Q2、s、Q3
 
-dot_Phi=[L1*cos(Q1)*dQ1-dL2*sin(Q2)-L2*cos(Q2)*dQ2;
-           -L1*sin(Q1)*dQ1-dL2*cos(Q2)+L2*sin(Q2)*dQ2;
-           -L4*sin(Q3)*dQ3-L3*cos(Q2)*dQ2-ds;
-           L4*cos(Q3)*dQ3+L3*sin(Q2)*dQ2];
+Phi_t=zeros(4,1);
+dot_Phi=Jacob*[dQ1;dL2;dQ2;ds;dQ3]+Phi_t;
+
+
 
 A_1=[2*cos(Q2),-L2*sin(Q2),0,0;
     -2*sin(Q2),-L2*cos(Q2),0,0;
