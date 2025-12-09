@@ -6,8 +6,11 @@ Q3=x(11);dQ3=x(12);ddQ3=x(13);
 s=x(14);ds=x(15);dds=x(16);
 dL2=x(17);ddL2=x(18);D=x(19);
 
-k=4;%定义约束数
-[alpha,beta]=BSM(x,k);
+ % k=4;%定义约束数
+ % [alpha,beta]=BSM(x,k);
+ alpha=0.1;beta=sqrt(2)*0.1;
+% k1=alpha;k2=beta;
+
 
 %相关定义
 %Phi为位置约束列向量
