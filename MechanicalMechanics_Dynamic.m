@@ -6,14 +6,13 @@ Q3=x(11);dQ3=x(12);ddQ3=x(13);
 s=x(14);ds=x(15);dds=x(16);
 dL2=x(17);ddL2=x(18);D=x(19);
 
-  k=4;%定义约束数
-  [alpha,beta]=BSM(x,k);
- %alpha=0.1;beta=sqrt(2)*0.1;
-% k1=alpha;k2=beta;
+  % k=4;%定义约束数
+  % [alpha,beta]=BSM(x,k);
+ alpha=0.1;beta=sqrt(2)*0.1;
 
-% 防御性检查：防止 NaN 传入导致整个仿真崩溃
-if isnan(alpha) || isinf(alpha), alpha = 0; end
-if isnan(beta) || isinf(beta), beta = 0; end
+% % 防御性检查：防止 NaN 传入导致整个仿真崩溃
+% alpha = min(alpha, 50); 
+% beta  = min(beta, 50);
 
 
 %相关定义
@@ -25,7 +24,8 @@ Phi=[ L1*sin(Q1) - L2*sin(Q2);
 
 %dot_Phi为速度约束列向量
 Jacob=[L1*cos(Q1),-sin(Q2),-(L2)*cos(Q2),0,0;
-        -L1*sin(Q1),-cos(Q2),(L2)*sin(Q2),0,0;
+        
+-L1*sin(Q1),-cos(Q2),(L2)*sin(Q2),0,0;
         0,0,-(L3)*cos(Q2),-1,-(L4)*sin(Q3);
         0,0,(L3)*sin(Q2),0,(L4)*cos(Q3)
 ];%Q1、L2、Q2、s、Q3
@@ -52,7 +52,7 @@ A_2=[sin(Q2),L2*cos(Q2),0,0;
 b_1=[L1*cos(Q1);-L1*sin(Q1);0;0]*ddQ1;
 b_2=[-L1*sin(Q1);-L1*cos(Q1);0;0]*((dQ1)^2);
 
-b=((b_1+b_2)-A_1)-(2*alpha*dot_Phi+(beta^2)*Phi);
+b=((b_1+b_2)-A_1)+(2*alpha*dot_Phi+(beta^2)*Phi);
 
 if abs(det(A_2)) < 1e-6
     % 如果矩阵接近奇异，使用伪逆 (pinv) 或者输出 0 防止报错
