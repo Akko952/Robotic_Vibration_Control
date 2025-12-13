@@ -58,7 +58,8 @@ D+(L1)*cos(Q1)-(L2_curr)*cos(Q2_curr);
 %         0,-(L3)*cos(Q2),-1,-(L4)*sin(Q3);
 %         0,(L3)*sin(Q2),0,(L4)*cos(Q3)
 % ];%Q1、Q2、s、Q3
-
+%在这迭代之前，已经确定了Q1，也就是Q1为已知条件在方程组内，
+% 待求的方程组的变量不包含Q1，故这里的Jacob不需要对Q1求导
 Jacob=[-sin(Q2_curr),-(L2_curr)*cos(Q2_curr),0,0;
         -cos(Q2_curr),(L2_curr)*sin(Q2_curr),0,0;
         0,-(L3)*cos(Q2_curr),-1,-(L4)*sin(Q3_curr);

@@ -3,6 +3,7 @@
 % １９７２ 年，Ｂａｕｍｇａｒｔｅ 提 出 了 约 束 违 约 稳 定 法
 % （ＢＳＭ），该方法利用反馈控制理论，将位移约束和速度约束引入加速度约束方程，通过约束修正得到稳定化的动力学方程
 function [alpha,beta]=BSM(x,n)
+%定义相关变量
 L1=x(1);L2=x(2);L3=x(3);L4=x(4);
 Q1=x(5);dQ1=x(6);ddQ1=x(7);
 Q2=x(8);dQ2=x(9);ddQ2=x(10);
@@ -11,12 +12,12 @@ s=x(14);ds=x(15);dds=x(16);
 dL2=x(17);ddL2=x(18);D=x(19);
 
 
-%相关定义
+%BSM相关定义
 %Phi为位置约束列向量
 Phi=[ L1*sin(Q1) - L2*sin(Q2);
     D+L1*cos(Q1) - L2*cos(Q2);
     L4*cos(Q3) - L3*sin(Q2)-s;
-    L4*sin(Q3) - L3*cos(Q2)];
+    L4*sin(Q3) - L3*cos(Q2)];%=0
 
 %dot_Phi为速度约束列向量
 % Jacob=[(L1)*cos(Q1),-(L2)*cos(Q2),0,0;
@@ -29,7 +30,9 @@ Jacob=[L1*cos(Q1),-sin(Q2),-(L2)*cos(Q2),0,0;
         -L1*sin(Q1),-cos(Q2),(L2)*sin(Q2),0,0;
         0,0,-(L3)*cos(Q2),-1,-(L4)*sin(Q3);
         0,0,(L3)*sin(Q2),0,(L4)*cos(Q3)
-];%Q1、L2、Q2、s、Q3
+];%Q1、L2、Q2、s、Q3=0
+%这里的雅可比为全部坐标的雅可比
+%对位置约束求一阶导数，根据链式求导法则，为雅可比矩阵乘速度矢量
 
  % Phi_t=[L1*cos(Q1)*dQ1-dL2*sin(Q2)-L2*cos(Q2)*dQ2;
  %            -L1*sin(Q1)*dQ1-dL2*cos(Q2)+L2*sin(Q2)*dQ2;
@@ -71,8 +74,8 @@ norm_Phi = sqrt(Phi'*Phi);
 norm_dotPhi = sqrt(dot_Phi'*dot_Phi);
 
 % 使用 log10 替换 lg，并加入 eps 防止负无穷
-err_Phi = log10(norm_Phi/n + eps); 
-err_dotPhi = log10(norm_dotPhi/n + eps); 
+err_Phi = log10(norm_Phi/n + 1); 
+err_dotPhi = log10(norm_dotPhi/n + 1); 
 
 %定义计算误差、乘法函数
 err=1;
