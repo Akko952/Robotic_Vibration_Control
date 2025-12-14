@@ -59,7 +59,7 @@ GenerateSimplifiedMechanism(x);
 %设置初始角加速度ddQ1
 %dQ1=5*pi/-180;
 
-ddQ1=5*pi/180;
+ddQ1=10*pi/180;
 %x(6)=dQ1;
 
 

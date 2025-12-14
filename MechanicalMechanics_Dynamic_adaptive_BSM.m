@@ -1,4 +1,4 @@
-function [ddL2,ddQ2,dds,ddQ3]=MechanicalMechanics_Dynamic_adaptive_BSM(x)
+function [ddL2,ddQ2,dds,ddQ3]=MechanicalMechanics_Dynamic_adaptive_BSM(x,t)
 L1=x(1);L2=x(2);L3=x(3);L4=x(4);
 Q1=x(5);dQ1=x(6);ddQ1=x(7);
 Q2=x(8);dQ2=x(9);ddQ2=x(10);
@@ -7,7 +7,8 @@ s=x(14);ds=x(15);dds=x(16);
 dL2=x(17);ddL2=x(18);D=x(19);
 
    k=4;%定义约束数
-   [alpha,beta]=BSM(x,k);
+[alpha,beta] = BSM(x,k);
+   % [alpha,beta]=BSM(x,k);
  %alpha=0.1;beta=sqrt(2)*0.1;
 
 % % 防御性检查：防止 NaN 传入导致整个仿真崩溃
@@ -23,53 +24,37 @@ Phi=[ L1*sin(Q1) - L2*sin(Q2);
     L4*sin(Q3) - L3*cos(Q2);];
 
 %dot_Phi为速度约束列向量
-Jacob=[-sin(Q2),-(L2)*cos(Q2),0,0;
--cos(Q2),(L2)*sin(Q2),0,0;
-0,-(L3)*cos(Q2),-1,-(L4)*sin(Q3);
-0,(L3)*sin(Q2),0,(L4)*cos(Q3)
-];%dL2、dQ2、ds、dQ3
+Jacob=[L1*cos(Q1),-sin(Q2),-(L2)*cos(Q2),0,0;
+        -L1*sin(Q1),-cos(Q2),(L2)*sin(Q2),0,0;
+        0,0,-(L3)*cos(Q2),-1,-(L4)*sin(Q3);
+        0,0,(L3)*sin(Q2),0,(L4)*cos(Q3)
+];%Q1、L2、Q2、s、Q3=0
 
 Phi_t=zeros(4,1);
-dot_Phi=Jacob*[dL2;dQ2;ds;dQ3]+Phi_t;
+dot_Phi=Jacob*[dQ1;dL2;dQ2;ds;dQ3]+Phi_t;
 
 
-% ddot_Phi = [
-%     % 第 1 行
-%     L1*(cos(Q1)*ddQ1 - sin(Q1)*dQ1^2) ...
-%     - ddL2*sin(Q2) - 2*dL2*cos(Q2)*dQ2 ...
-%     + L2*sin(Q2)*dQ2^2 - L2*cos(Q2)*ddQ2;
-% 
-%     % 第 2 行
-%     -L1*(sin(Q1)*ddQ1 + cos(Q1)*dQ1^2) ...
-%     - ddL2*cos(Q2) + 2*dL2*sin(Q2)*dQ2 ...
-%     + L2*cos(Q2)*dQ2^2 + L2*sin(Q2)*ddQ2;
-% 
-%     % 第 3 行
-%     -L4*(sin(Q3)*ddQ3 + cos(Q3)*dQ3^2) ...
-%     - L3*(cos(Q2)*ddQ2 - sin(Q2)*dQ2^2) ...
-%     - dds;
-% 
-%     % 第 4 行
-%     L4*(cos(Q3)*ddQ3 - sin(Q3)*dQ3^2) ...
-%     + L3*(sin(Q2)*ddQ2 + cos(Q2)*dQ2^2)
-% ];
+% A_1=[-2*cos(Q2),L2*sin(Q2),0,0;
+%     2*sin(Q2),L2*cos(Q2),0,0;
+%     0,L3*sin(Q2),0,-L4*cos(Q3);
+%     0,L3*cos(Q2),0,-L4*sin(Q3)
+% ]*[dQ2*dL2;dQ2^2;ds;dQ3^2];
+%dot_Jacob,除去了ds项，可能会导致det为0
+A_1=[-2*cos(Q2),L2*sin(Q2),0;
+    2*sin(Q2),L2*cos(Q2),0;
+    0,L3*sin(Q2),-L4*cos(Q3);
+    0,L3*cos(Q2),-L4*sin(Q3)
+]*[dQ2*dL2;dQ2^2;dQ3^2];
 
-A_1=[2*cos(Q2),-L2*sin(Q2),0,0;
-    -2*sin(Q2),-L2*cos(Q2),0,0;
-    0,-L3*sin(Q2),0,L4*cos(Q3);
-    0,L3*cos(Q2),0,-L4*sin(Q3)
-]*[dQ2*dL2;dQ2^2;ds;dQ3^2];
+A_2=[-sin(Q2),-(L2)*cos(Q2),0,0;
+        -cos(Q2),(L2)*sin(Q2),0,0;
+        0,-(L3)*cos(Q2),-1,-(L4)*sin(Q3);
+        0,(L3)*sin(Q2),0,(L4)*cos(Q3)
+];%ddL2、ddQ2、dds、ddQ3
 
 
-A_2=[sin(Q2),L2*cos(Q2),0,0;
-    cos(Q2),-L2*sin(Q2),0,0;
-    0,L3*cos(Q2),1,L4*sin(Q3);
-    0,L3*sin(Q2),0,L4*cos(Q3)
-];%*[ddL2;ddQ2;dds;ddQ3]
-
-
-b_1=[L1*cos(Q1);-L1*sin(Q1);0;0]*ddQ1;
-b_2=[-L1*sin(Q1);-L1*cos(Q1);0;0]*((dQ1)^2);
+b_1=-[L1*cos(Q1);-L1*sin(Q1);0;0]*ddQ1;
+b_2=-[-L1*sin(Q1);-L1*cos(Q1);0;0]*((dQ1)^2);
 
 b=((b_1+b_2)-A_1)-(2*alpha*dot_Phi+(beta^2)*Phi);
 

@@ -70,15 +70,15 @@ if nargin < 2 || n == 0
 end
 
 % 2. 计算模长，加上 eps 防止 log(0)
-norm_Phi = sqrt(Phi'*Phi);
-norm_dotPhi = sqrt(dot_Phi'*dot_Phi);
+norm_Phi = sqrt(Phi'*Phi/n);
+norm_dotPhi = sqrt(dot_Phi'*dot_Phi/n);
 
 % 使用 log10 替换 lg，并加入 eps 防止负无穷
-err_Phi = log10(norm_Phi/n + 1); 
-err_dotPhi = log10(norm_dotPhi/n + 1); 
+err_Phi = log10(norm_Phi +eps); 
+err_dotPhi = log10(norm_dotPhi +eps); 
 
 %定义计算误差、乘法函数
-err=1;
+err=1;%定步长算法
 
 % 定义分段函数
 ec = @(z) (z >= -6) * 10 + (z <= -16) * 0 + ...
@@ -87,7 +87,8 @@ ec = @(z) (z >= -6) * 10 + (z <= -16) * 0 + ...
 y=@(z) 10*err*ec(z);
 
 %计算算子
-alpha=y(err_Phi);
-beta=y(err_dotPhi);
-
+alpha=y(err_dotPhi);
+beta=y(err_Phi);
+%做数据保护
+alpha = min(max(alpha,0),100); beta = min(max(beta,0),100);
 end
