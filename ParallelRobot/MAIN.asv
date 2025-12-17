@@ -1,0 +1,13 @@
+Kinematic;
+%做出初始示意图的帧
+frame1 = plot_screws_and_links(S1, false);
+frame2 = plot_screws_and_links(S2, false);
+frame3 = plot_screws_and_links(S3, false);
+
+S_leg(1).ri = S1(1).ri;
+S_leg(2).ri = S2(1).ri;
+S_leg(3).ri = S3(1).ri;
+
+frame = plot_p_r_links(p, S_leg, false);
+
+%计算初始
