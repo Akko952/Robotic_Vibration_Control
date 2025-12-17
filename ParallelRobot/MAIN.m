@@ -1,0 +1,54 @@
+clc; clear; close all;
+Kinematic;
+%做出初始示意图的帧
+frame1 = plot_screws_and_links(S1, true);
+frame2 = plot_screws_and_links(S2, true);
+frame3 = plot_screws_and_links(S3, true);
+
+S_leg(1).ri = S1(1).ri;
+S_leg(2).ri = S2(1).ri;
+S_leg(3).ri = S3(1).ri;
+
+frame0 = plot_p_r_links(p, S_leg, true);
+
+
+
+%计算初始时的POE
+%对于链1
+
+  T_branch_1=branch_forward_kinematics(S1,[0,0,0,0,0],T_01);
+ % trans_exp_screw(S1(5).xi,0)*...
+ % trans_exp_screw(S1(4).xi,0)*...
+ % trans_exp_screw(S1(3).xi,0)*...
+ % trans_exp_screw(S1(2).xi,0)*...
+ % trans_exp_screw(S1(1).xi,0)*T_01;
+ %对于链2
+  T_branch_2=branch_forward_kinematics(S2,[0,0,0,0,0],T_01);
+ %  trans_exp_screw(S2(5).xi,0)*...
+ % trans_exp_screw(S2(4).xi,0)*...
+ % trans_exp_screw(S2(3).xi,0)*...
+ % trans_exp_screw(S2(2).xi,0)*...
+ % trans_exp_screw(S2(1).xi,0)*T_01;
+  %对于链3
+    T_branch_3=branch_forward_kinematics(S3,[0,0,0,0,0],T_01);
+ %    trans_exp_screw(S3(5).xi,0)*...
+ % trans_exp_screw(S3(4).xi,0)*...
+ % trans_exp_screw(S3(3).xi,0)*...
+ % trans_exp_screw(S3(2).xi,0)*...
+ % trans_exp_screw(S3(1).xi,0)*T_01;
+
+ % r_b(1)=S1(1).ri;
+ % r_b(2)=S2(1).ri;
+ % r_b(3)=S3(1).ri;
+ %设置目标动平台的位姿
+ T = [1, 0, 0, 0;
+     0, cosd(60), -sind(60), 0;
+     0, sind(60), cosd(60), 0;
+     0, 0, 0, 1];
+ T_des=[1,0,0,0;...
+    0,1,0,0;...
+    0,0,1,-5;...
+    0,0,0,1]*T;
+ [d, passive_angles] = inverse_kinematics(T_des, p);
+
+  reflash_Kinematic(T_des, p,T_12,T_13);
