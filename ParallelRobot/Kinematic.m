@@ -1,4 +1,5 @@
 clear ;clc;
+%初始化运动学
 %将主轴看作一个点（材料力学：长径比）
 % Screw=[Pos_q,vec_s,h];
 % V=[Omega;......
@@ -29,8 +30,8 @@ p.s1=[4;0;0];
 p.s2=transform_Point_vector(T_12,[4;0;0]);
 p.s3=transform_Point_vector(T_13,[4;0;0]);
 p.b1=[1;0;0];
-p.b2=[1;0;0];
-p.b3=[1;0;0];
+p.b2=transform_Point_vector(T_12,[1;0;0]);
+p.b3=transform_Point_vector(T_13,[1;0;0]);
 % 参数
 
 %链路1的关节
@@ -78,7 +79,7 @@ S2(5) = struct('i',[],'s_hat',[],'ri',[],'nu',[]);
 %旋转副
 S2(1).i = 1; 
 S2(1).s_hat =rotate_vector(T_01*T_12,[0;1;0])/norm(rotate_vector(T_01*T_12,[0;1;0]));
-S2(1).ri=transform_Point_vector(T_01*T_12,p.b2); 
+S2(1).ri=transform_Point_vector(T_01,p.b2); 
 S2(1).nu =-vector_to_skew_symmetric(S2(1).s_hat)*S2(1).ri ;
 S2(1).xi=[S2(1).s_hat;...
     S2(1).nu];%旋转副的旋量
@@ -115,7 +116,7 @@ S3(5) = struct('i',[],'s_hat',[],'ri',[],'nu',[]);
 %旋转副
 S3(1).i = 1; 
 S3(1).s_hat =rotate_vector(T_01*T_13,[0;1;0])/norm(rotate_vector(T_01*T_13,[0;1;0]));
-S3(1).ri=transform_Point_vector(T_01*T_13,p.b3); 
+S3(1).ri=transform_Point_vector(T_01,p.b3); 
 S3(1).nu =-vector_to_skew_symmetric(S3(1).s_hat)*S3(1).ri ;
 S3(1).xi=[S3(1).s_hat;...
     S3(1).nu];%旋转副的旋量
