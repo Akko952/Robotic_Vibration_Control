@@ -12,10 +12,10 @@ D=x(19);
 
 %猜测Q2、Q3、L2、s的初始值
 Q2_guess=10*pi/180;
-Q3_guess=20*pi/180;
+Q3_guess=-160*pi/180;
 L2_guess=15;
-s_guess=4;
-Inition=[L2_guess,Q2_guess,s_guess,Q3_guess];
+s_guess=-4;
+Inition=[L2_guess;Q2_guess;s_guess;Q3_guess];
 
 %方程组解析式;
 %方程组：
