@@ -1,5 +1,5 @@
 %% Simulink数据转GIF脚本
-filename = 'Adams_HW_Mechanism_Animation.gif'; % 输出文件名
+filename = 'Adams_HW_Mechanism_Animation_x.gif'; % 输出文件名
 
 % 1. 准备数据 (假设 simDataX 是 N*13 的矩阵)
 % 如果你的数据在 out.simDataX 里，请执行：data = out.simDataX;
@@ -9,7 +9,7 @@ t = out.tout; % 时间向量
 % 2. 创建画布
 hFig = figure('Color', 'w', 'Name', '机构仿真动画');
 % 设置固定坐标轴范围（根据你的机构尺寸调整，防止画面跳动）
-axis_range = [-50, 200, -50, 150]; 
+axis_range = [-5, 5, -5, 5]; 
 
 % 3. 循环绘图
 count = 1;

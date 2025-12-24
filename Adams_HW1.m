@@ -9,10 +9,10 @@ x = zeros(13,1);
 %n=2;%约束方程个数
 
 %定义.初始值
-x(1)=10;
-x(2)=20;
-x(3)=25;
-x(4)=30;
+x(1)=1;
+x(2)=2;
+x(3)=2.5;
+x(4)=3;
 %Q1是一个时变信号，为广义坐标，但可以有初始值，定义为：
 x(5)=60*pi/180;
 
@@ -37,21 +37,28 @@ DrawPic(x);
 %做出图像，验证结果
 %完成初值求解
 %开始运动学迭代
-%设置初始角加速度ddQ1
-%dQ1=5*pi/-180;
-
-ddQ1=10*pi/180;
-%x(6)=dQ1;
+%设置初始角加速度ddQ1===设置初始驱动力矩
+M=-5;
+%设置质量矩阵
+m1=5;
+m2=5;
+m3=5;
+%设置转动惯量
+J1=(1/3)*m1*L1^2;
+J2=(1/12)*m2*L2^2;
+J3=(1/3)*m3*L3^2;
 
 %调用simulink
 out= sim('Adams_HW_Dynamic.slx', ...
     'SolverType', 'Fixed-step', ...
     'Solver', 'ode4', ...
     'FixedStep', '1e-4', ...
-    'StopTime', '20');
+    'StopTime', '5');
 
 % %再绘图并验证
-% Correct_new_data;
+% Adams_HW_DrawGIF;
+% Adams_HW_DrawGIF_Y;
+Adams_HW1_DetectTheData;
 %% 
 function [Q2,Q3]=Adams_Newton_Laersen(x)
 
@@ -128,7 +135,7 @@ P_R3 = O_R4 + [L3*cos(Q3), L3*sin(Q3)];
 %绘图输出
 
 figure; hold on; grid on; axis equal;
-xlabel('x 轴 (mm)'); ylabel('y 轴 (mm)'); 
+xlabel('x 轴 (m)'); ylabel('y 轴 (m)'); 
 title(['曲柄摇杆机构位置分析 (Q1 = ', num2str(rad2deg(Q1)), '°)']);
 
 % 绘制机架 L4 (虚线)
