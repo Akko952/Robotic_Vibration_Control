@@ -59,7 +59,7 @@ GenerateSimplifiedMechanism(x);
 %设置初始角加速度ddQ1
 %dQ1=5*pi/-180;
 
-ddQ1=5*pi/-180;
+ddQ1=10*pi/180;
 %x(6)=dQ1;
 
 
@@ -70,18 +70,18 @@ ddQ1=5*pi/-180;
 % Correct_new_data;
 
 %调用simulink
-% out= sim('Dynamic.slx', ...
-%     'SolverType', 'Fixed-step', ...
-%     'Solver', 'ode4', ...
-%     'FixedStep', '1e-4', ...
-%     'StopTime', '10');
-
-out = sim('Dynamic.slx', ...
-    'SolverType', 'Variable-step', ...
-    'Solver', 'ode15s', ...   % 改用 ode15s (刚性求解器)
-    'MaxStep', '1e-3', ...    % 限制最大步长
-    'RelTol', '1e-6', ...     % 相对误差容限
-    'AbsTol', '1e-6', ...     % 绝对误差容限
+out= sim('Dynamic.slx', ...
+    'SolverType', 'Fixed-step', ...
+    'Solver', 'ode4', ...
+    'FixedStep', '1e-4', ...
     'StopTime', '10');
+
+% out = sim('Dynamic.slx', ...
+%     'SolverType', 'Variable-step', ...
+%     'Solver', 'ode15s', ...   % 改用 ode15s (刚性求解器)
+%     'MaxStep', '1e-3', ...    % 限制最大步长
+%     'RelTol', '1e-6', ...     % 相对误差容限
+%     'AbsTol', '1e-6', ...     % 绝对误差容限
+%     'StopTime', '10');
 %再绘图并验证
 Correct_new_data;

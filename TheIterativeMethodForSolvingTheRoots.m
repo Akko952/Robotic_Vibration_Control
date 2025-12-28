@@ -1,3 +1,4 @@
+
 function [L2,Q2,s,Q3]=TheIterativeMethodForSolvingTheRoots(x)
 
 L1=x(1);%L2=x(2);
@@ -11,10 +12,10 @@ D=x(19);
 
 %猜测Q2、Q3、L2、s的初始值
 Q2_guess=10*pi/180;
-Q3_guess=20*pi/180;
+Q3_guess=-160*pi/180;
 L2_guess=15;
-s_guess=4;
-Inition=[L2_guess,Q2_guess,s_guess,Q3_guess];
+s_guess=-4;
+Inition=[L2_guess;Q2_guess;s_guess;Q3_guess];
 
 %方程组解析式;
 %方程组：
@@ -57,7 +58,8 @@ D+(L1)*cos(Q1)-(L2_curr)*cos(Q2_curr);
 %         0,-(L3)*cos(Q2),-1,-(L4)*sin(Q3);
 %         0,(L3)*sin(Q2),0,(L4)*cos(Q3)
 % ];%Q1、Q2、s、Q3
-
+%在这迭代之前，已经确定了Q1，也就是Q1为已知条件在方程组内，
+% 待求的方程组的变量不包含Q1，故这里的Jacob不需要对Q1求导
 Jacob=[-sin(Q2_curr),-(L2_curr)*cos(Q2_curr),0,0;
         -cos(Q2_curr),(L2_curr)*sin(Q2_curr),0,0;
         0,-(L3)*cos(Q2_curr),-1,-(L4)*sin(Q3_curr);
