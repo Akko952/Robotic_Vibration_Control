@@ -12,7 +12,7 @@ function frame = plot_screws_and_links(S, if_clear, radius, len, cylColor, lineC
 % 输出:
 %   frame     : getframe 捕获的帧，可用于生成动画
 
-    if nargin < 3 || isempty(radius),    radius   = 0.02;      end
+    if nargin < 3 || isempty(radius),    radius   = 0.1;      end
     if nargin < 4 || isempty(len),       len      = 0.5;      end
     if nargin < 5 || isempty(cylColor),  cylColor = [0 0 1]; end
     if nargin < 6 || isempty(lineColor), lineColor= [0 0 0]; end
@@ -23,10 +23,21 @@ function frame = plot_screws_and_links(S, if_clear, radius, len, cylColor, lineC
     for i = 1:n
         ri    = S(i).ri;     % 世界系位置
         s_hat = S(i).s_hat;  % 世界系方向
-
+        if i == 3
+            cylColor_i = [1 0 0];   % 主轴（沿移动副）
+        elseif i == 4
+            cylColor_i = [0 1 0];   % 球铰正交轴 1
+        elseif i == 5
+            cylColor_i = [0 0 1];   % 球铰正交轴 2
+        else
+            cylColor_i = cylColor; % 其他关节
+        end
         % 绘制关节圆柱
-        draw_cylinder_at(ri, s_hat, radius, len, cylColor);
-
+        draw_cylinder_at(ri, s_hat, radius, len, cylColor_i);
+    % ===== 在圆柱中心画方向箭头（调试用）=====
+    quiver3(ri(1), ri(2), ri(3), ...
+            s_hat(1)*len, s_hat(2)*len, s_hat(3)*len, ...
+            'k','LineWidth',1.5,'MaxHeadSize',0.5);
         % 连接相邻 ri
         if i < n
             rj = S(i+1).ri;

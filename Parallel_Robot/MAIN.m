@@ -1,5 +1,5 @@
 clc; clear; close all;
-Kinematic;
+Kinematic;%初始化运动学参数
 %做出初始示意图的帧
 frame1 = plot_screws_and_links(S1, true);
 frame2 = plot_screws_and_links(S2, true);
@@ -10,9 +10,7 @@ S_leg(2).ri = S2(1).ri;
 S_leg(3).ri = S3(1).ri;
 
 frame0 = plot_p_r_links(p, S_leg, true);
-
-
-
+%设置初始时动平台的位姿
 %计算初始时的POE
 %对于链1
 
@@ -42,8 +40,8 @@ frame0 = plot_p_r_links(p, S_leg, true);
  % r_b(3)=S3(1).ri;
  %设置目标动平台的位姿
  T = [1, 0, 0, 0;
-     0, cosd(60), -sind(60), 0;
-     0, sind(60), cosd(60), 0;
+     0, cosd(30), -sind(30), 0;
+     0, sind(30), cosd(30), 0;
      0, 0, 0, 1];
  T_des=[1,0,0,0;...
     0,1,0,0;...

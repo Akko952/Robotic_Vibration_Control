@@ -59,7 +59,7 @@ S1(3).nu =-vector_to_skew_symmetric(S1(3).s_hat)*S1(3).ri ;%Z轴，沿着移动�
 S1(3).xi=[S1(3).s_hat;...
     S1(3).nu];%旋转副的旋量
 
-[s_hat_s14, s_hat_s15]=find_orthogonal_vectors(S1(3).s_hat);
+[s_hat_s14, s_hat_s15]=find_orthogonal_vectors_inition(S1(3).s_hat);
 
 S1(4).i = 4; S1(4).s_hat = s_hat_s14; S1(4).ri =p.s1;
 S1(4).nu =-vector_to_skew_symmetric(S1(4).s_hat)*S1(4).ri ;
@@ -98,7 +98,7 @@ S2(3).ri =p.s2;
 S2(3).nu =-vector_to_skew_symmetric(S2(3).s_hat)*S2(3).ri ;%Z轴，沿着移动副
 S2(3).xi=[S2(3).s_hat;...
     S2(3).nu];%旋转副的旋量
-[s_hat_S24, s_hat_S25]=find_orthogonal_vectors(S2(3).s_hat);
+[s_hat_S24, s_hat_S25]=find_orthogonal_vectors_inition(S2(3).s_hat);
 
 S2(4).i = 4; S2(4).s_hat = s_hat_S24; S2(4).ri =p.s2;
 S2(4).nu =-vector_to_skew_symmetric(S2(4).s_hat)*S2(4).ri ;
@@ -134,7 +134,7 @@ S3(3).ri =p.s3;
 S3(3).nu =-vector_to_skew_symmetric(S3(3).s_hat)*S3(3).ri ;%Z轴，沿着移动副
 S3(3).xi=[S3(3).s_hat;...
     S3(3).nu];%旋转副的旋量
-[s_hat_S34, s_hat_S35]=find_orthogonal_vectors(S3(3).s_hat);
+[s_hat_S34, s_hat_S35]=find_orthogonal_vectors_inition(S3(3).s_hat);
 
 S3(4).i = 4; S3(4).s_hat = s_hat_S34; S3(4).ri =p.s3;
 S3(4).nu =-vector_to_skew_symmetric(S3(4).s_hat)*S3(4).ri ;
@@ -145,3 +145,14 @@ S3(5).i = 5; S3(5).s_hat = s_hat_S35; S3(5).ri =p.s3;
 S3(5).nu =-vector_to_skew_symmetric(S3(5).s_hat)*S3(5).ri ;
 S3(5).xi=[S3(5).s_hat;...
     S3(5).nu];%旋转副的旋量
+
+
+%     % ===== 把初始化结果写入连续更新缓存 =====
+% s14_prev = s_hat_s14;
+% s15_prev = s_hat_s15;
+
+% s24_prev = s_hat_S24;
+% s25_prev = s_hat_S25;
+
+% s34_prev = s_hat_S34;
+% s35_prev = s_hat_S35;
