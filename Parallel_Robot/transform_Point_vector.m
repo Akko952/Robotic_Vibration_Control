@@ -7,13 +7,7 @@ function v_transformed = transform_Point_vector(T, v)
 %
 % 输出:
 %   v_transformed - 变换后的 3x1 向量 或 3xN 矩阵
-%
-% 使用示例:
-%   T = [eye(3), [10;0;0]; 0 0 0 1]; % 沿x轴平移10
-%   p = [1; 2; 3];
-%   p_new = transform_vector(T, p);
-
-    % 1. 检查输入 T 的维度
+    % 1. 检查输入 T 的维度，保护性检查
     if ~isequal(size(T), [4, 4])
         error('输入错误: T 必须是 4x4 的齐次变换矩阵。');
     end
@@ -38,7 +32,7 @@ function v_transformed = transform_Point_vector(T, v)
     % 构建齐次坐标矩阵 (在底部加一行全为1的行向量)
     v_homogeneous = [v; ones(1, cols)];
     
-    % 矩阵乘法 T * P
+    % 变换算法 T * P
     v_transformed_homo = T * v_homogeneous;
     
     % 4. 提取结果 (取前3行)

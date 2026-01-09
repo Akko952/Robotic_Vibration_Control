@@ -1,0 +1,33 @@
+%计算各个开环链的空间Jacobian
+Js15=Ad_all_1(:,:,1)*S1(1).xi;
+Js14=Ad_all_1(:,:,2)*S1(2).xi;
+Js13=Ad_all_1(:,:,3)*S1(3).xi;
+Js12=Ad_all_1(:,:,4)*S1(4).xi;
+Js11=Ad_all_1(:,:,5)*S1(5).xi;
+Js_1=[Js11,Js12,Js13,Js14,Js15];
+R1=rank(Js_1);%检查支链的自由度，得到为5
+Js25=Ad_all_2(:,:,1)*S2(1).xi;
+Js24=Ad_all_2(:,:,2)*S2(2).xi;
+Js23=Ad_all_2(:,:,3)*S2(3).xi;
+Js22=Ad_all_2(:,:,4)*S2(4).xi;
+Js21=Ad_all_2(:,:,5)*S2(5).xi;
+Js_2=[Js21,Js22,Js23,Js24,Js25];
+R2=rank(Js_2);%检查支链的自由度，得到为5
+Js35=Ad_all_3(:,:,1)*S3(1).xi;
+Js34=Ad_all_3(:,:,2)*S3(2).xi;
+Js33=Ad_all_3(:,:,3)*S3(3).xi;
+Js32=Ad_all_3(:,:,4)*S3(4).xi;
+Js31=Ad_all_3(:,:,5)*S3(5).xi;
+Js_3=[Js31,Js32,Js33,Js34,Js35];
+R3=rank(Js_3);%检查支链的自由度，得到为5
+%% 组装成成速度雅可比约束矩阵形式
+Jacobian_spctial_platform_by_limb=[Js_1,-Js_2,zeros(6,5);zeros(6,5),-Js_2,Js_3];%闭环约束雅可比
+%计算约束雅可比和主动雅可比
+H_p=[Jacobian_spctial_platform_by_limb(:,1:3),Jacobian_spctial_platform_by_limb(:,5),...
+Jacobian_spctial_platform_by_limb(:,6:8),Jacobian_spctial_platform_by_limb(:,10),...
+Jacobian_spctial_platform_by_limb(:,11:13),Jacobian_spctial_platform_by_limb(:,15)];%被动关节雅可比矩阵
+H_a=[Jacobian_spctial_platform_by_limb(:,4),Jacobian_spctial_platform_by_limb(:,9),Jacobian_spctial_platform_by_limb(:,14)];%主动关节雅可比矩阵(为各个limb的Js_i4)
+ g=-inv(H_p)*H_a;%被动-主动速度传递矩阵
+ Ja1=Js_1*[g(1:3,:);[1,0,0];g(4,:)];%各支链主动雅可比
+ Ja2=Js_2*[g(5:7,:);[0,1,0];g(8,:)]; 
+Ja3=Js_3*[g(9:11,:);[0,0,1];g(12,:)];

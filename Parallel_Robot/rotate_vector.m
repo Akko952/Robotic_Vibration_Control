@@ -11,9 +11,7 @@ function v_rotated = rotate_vector(T, v)
 %
 % 原理:
 %   v_new = R * v  (其中 R = T(1:3, 1:3))
-%   注意：此函数不会应用 T 中的平移部分 T(1:3, 4)
-
-    % 1. 检查输入 T
+    % 1. 检查输入 T，保护性检查
     if ~isequal(size(T), [4, 4])
         error('输入错误: T 必须是 4x4 的齐次变换矩阵。');
     end
@@ -36,8 +34,5 @@ function v_rotated = rotate_vector(T, v)
 
     % 4. 执行旋转变换
     v_rotated = R * v;
-    
-    % 注意：如果 T 是标准旋转矩阵，理论上向量长度不变。
-    % 只要输入 v 是单位向量，输出 v_rotated 也是单位向量，无需再次 norm。
 
 end

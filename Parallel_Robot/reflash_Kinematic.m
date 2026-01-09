@@ -1,20 +1,45 @@
-function frame = reflash_Kinematic(T_des, p,T_12,T_13)
+ function [S1, S2, S3, frame] =reflash_Kinematic(T_des, p,T_12,T_13)
         % ===== 为连续 S 副保存上一帧正交轴 =====
-    persistent s14_prev s15_prev s24_prev s25_prev s34_prev s35_prev
-if isempty(s14_prev)
+persistent s14_prev s15_prev
+persistent s24_prev s25_prev
+persistent s34_prev s35_prev
+        %%
     % 用当前几何关系初始化（第一帧）
+if isempty(s15_prev)
+    % --- 第 1 条支链 ---
     s1_hat = (transform_Point_vector(T_des, p.b1) - p.s1);
     s1_hat = s1_hat / norm(s1_hat);
 
+    s13_hat = s1_hat;% 也就是移动副方向
+
+    tmp = rotate_vector(T_des,[0;1;0]);
+    s14_prev = tmp - dot(tmp,s13_hat)*s13_hat;
+    s14_prev = s14_prev/norm(s14_prev);
+
+    % --- 第 2 条支链 ---
     s2_hat = (transform_Point_vector(T_des, p.b2) - p.s2);
     s2_hat = s2_hat / norm(s2_hat);
 
+    s23_hat = s2_hat;% 也就是移动副方向
+
+ tmp = rotate_vector(T_des*T_12,[0;1;0]);
+    s24_prev = tmp - dot(tmp,s23_hat)*s23_hat;
+    s24_prev = s24_prev/norm(s24_prev);
+
+
+    % --- 第 3 条支链 ---
     s3_hat = (transform_Point_vector(T_des, p.b3) - p.s3);
     s3_hat = s3_hat / norm(s3_hat);
 
-    [s14_prev, s15_prev] = find_orthogonal_vectors_inition(s1_hat);
-    [s24_prev, s25_prev] = find_orthogonal_vectors_inition(s2_hat);
-    [s34_prev, s35_prev] = find_orthogonal_vectors_inition(s3_hat);
+    s33_hat = s3_hat;% 也就是移动副方向
+    
+    tmp = rotate_vector(T_des*T_13,[0;1;0]);
+    s34_prev = tmp - dot(tmp,s33_hat)*s33_hat;
+    s34_prev = s34_prev/norm(s34_prev);
+
+    [s15_prev] = find_orthogonal_vectors_inition(s13_hat,s14_prev);
+    [ s25_prev] = find_orthogonal_vectors_inition(s23_hat,s24_prev);
+    [ s35_prev] = find_orthogonal_vectors_inition(s33_hat,s34_prev);
 end
     % 计算并更新新的铰点位置
     S1(1).ri= transform_Point_vector(T_des, p.b1);
@@ -34,17 +59,16 @@ end
     S1(3).xi=[S1(3).s_hat;...
         S1(3).nu];%旋转副的旋量
 
-[s_hat_s14, s_hat_s15] = ...
-    find_orthogonal_vectors_flash(S1(3).s_hat, s14_prev, s15_prev);
-
-s14_prev = s_hat_s14;
-s15_prev = s_hat_s15;
-
-    S1(4).i = 4; S1(4).s_hat = s_hat_s14; S1(4).ri =p.s1;
+    S1(4).i = 4; S1(4).s_hat = s14_prev;S1(4).ri =p.s1;
     S1(4).nu =-vector_to_skew_symmetric(S1(4).s_hat)*S1(4).ri ;
     S1(4).xi=[S1(4).s_hat;...
         S1(4).nu];%旋转副的旋量
 
+s_hat_s15 = find_orthogonal_vectors_flash( ...
+              S1(3).s_hat, ...
+              s14_prev, ...
+              s15_prev );
+s15_prev = s_hat_s15;
 
     S1(5).i = 5; S1(5).s_hat = s_hat_s15; S1(5).ri =p.s1;
     S1(5).nu =-vector_to_skew_symmetric(S1(5).s_hat)*S1(5).ri ;
@@ -72,17 +96,19 @@ S2(3).ri =p.s2;
 S2(3).nu =-vector_to_skew_symmetric(S2(3).s_hat)*S2(3).ri ;%Z轴，沿着移动副
 S2(3).xi=[S2(3).s_hat;...
     S2(3).nu];%旋转副的旋量
-[s_hat_S24, s_hat_S25] = ...
-    find_orthogonal_vectors_flash(S2(3).s_hat, s24_prev, s25_prev);
 
-s24_prev = s_hat_S24;
-s25_prev = s_hat_S25;
 
-S2(4).i = 4; S2(4).s_hat = s_hat_S24; S2(4).ri =p.s2;
+S2(4).i = 4; S2(4).s_hat = s24_prev; S2(4).ri =p.s2;
 S2(4).nu =-vector_to_skew_symmetric(S2(4).s_hat)*S2(4).ri ;
 S2(4).xi=[S2(4).s_hat;...
     S2(4).nu];%旋转副的旋量
-S2(5).i = 5; S2(5).s_hat = s_hat_S25; S2(5).ri =p.s2;
+
+    s_hat_s25 = find_orthogonal_vectors_flash( ...
+                S2(3).s_hat, ...
+                s24_prev, ...
+                s25_prev );
+s25_prev = s_hat_s25;
+S2(5).i = 5; S2(5).s_hat = s_hat_s25; S2(5).ri =p.s2;
 S2(5).nu =-vector_to_skew_symmetric(S2(5).s_hat)*S2(5).ri ;
 S2(5).xi=[S2(5).s_hat;...
     S2(5).nu];%旋转副的旋量
@@ -107,38 +133,41 @@ S3(3).ri =p.s3;
 S3(3).nu =-vector_to_skew_symmetric(S3(3).s_hat)*S3(3).ri ;%Z轴，沿着移动副
 S3(3).xi=[S3(3).s_hat;...
     S3(3).nu];%旋转副的旋量
-[s_hat_S34, s_hat_S35] = ...
-    find_orthogonal_vectors_flash(S3(3).s_hat, s34_prev, s35_prev);
 
-s34_prev = s_hat_S34;
-s35_prev = s_hat_S35;
 
-S3(4).i = 4; S3(4).s_hat = s_hat_S34; S3(4).ri =p.s3;
+S3(4).i = 4; S3(4).s_hat = s34_prev; S3(4).ri =p.s3;
 S3(4).nu =-vector_to_skew_symmetric(S3(4).s_hat)*S3(4).ri ;
 S3(4).xi=[S3(4).s_hat;...
     S3(4).nu];%旋转副的旋量
 
-S3(5).i = 5; S3(5).s_hat = s_hat_S35; S3(5).ri =p.s3;
+s_hat_s35 = find_orthogonal_vectors_flash( ...
+              S3(3).s_hat, ...
+              s34_prev, ...
+              s35_prev );
+s35_prev = s_hat_s35;
+
+S3(5).i = 5; S3(5).s_hat = s_hat_s35; S3(5).ri =p.s3;
 S3(5).nu =-vector_to_skew_symmetric(S3(5).s_hat)*S3(5).ri ;
 S3(5).xi=[S3(5).s_hat;...
     S3(5).nu];%旋转副的旋量
+    %%
     % --- 3. 静平台点 (始终不变) ---
     % p.s1;
     % p.s2;
     % p.s3;
-
+    %%
     % --- 4. 绘图 ---
     hold off; % 清空上一帧
     %做出初始示意图的帧
-frame1 = plot_screws_and_links(S1, false);
-frame2 = plot_screws_and_links(S2, false);
-frame3 = plot_screws_and_links(S3, false);
+plot_screws_and_links(S1, false);
+plot_screws_and_links(S2, false);
+plot_screws_and_links(S3, false);
 
 S_leg(1).ri = S1(1).ri;
 S_leg(2).ri = S2(1).ri;
 S_leg(3).ri = S3(1).ri;
 
-frame0 = plot_p_r_links(p, S_leg, false);
+plot_p_r_links(p, S_leg, false);
     
     % --- 装饰 ---
     grid on; axis equal;
@@ -149,4 +178,4 @@ frame0 = plot_p_r_links(p, S_leg, false);
 
      drawnow;
      frame = getframe(gcf);
-end
+ end
