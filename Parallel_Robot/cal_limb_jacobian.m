@@ -1,4 +1,5 @@
-%计算各个开环链的空间Jacobian
+function [H_p,H_a,Ja1,Ja2,Ja3,g]= cal_limb_jacobian(S1,S2,S3,Ad_all_1,Ad_all_2,Ad_all_3)
+%计算各个开环链的空间Jacobian，一一对应与各个关节的伴随映射
 Js15=Ad_all_1(:,:,1)*S1(1).xi;
 Js14=Ad_all_1(:,:,2)*S1(2).xi;
 Js13=Ad_all_1(:,:,3)*S1(3).xi;
@@ -29,5 +30,9 @@ Jacobian_spctial_platform_by_limb(:,11:13),Jacobian_spctial_platform_by_limb(:,1
 H_a=[Jacobian_spctial_platform_by_limb(:,4),Jacobian_spctial_platform_by_limb(:,9),Jacobian_spctial_platform_by_limb(:,14)];%主动关节雅可比矩阵(为各个limb的Js_i4)
  g=-inv(H_p)*H_a;%被动-主动速度传递矩阵
  Ja1=Js_1*[g(1:3,:);[1,0,0];g(4,:)];%各支链主动雅可比
+ R0a1=rank(Ja1);
  Ja2=Js_2*[g(5:7,:);[0,1,0];g(8,:)]; 
+ R0a2=rank(Ja2);
 Ja3=Js_3*[g(9:11,:);[0,0,1];g(12,:)];
+R0a3=rank(Ja3);
+end

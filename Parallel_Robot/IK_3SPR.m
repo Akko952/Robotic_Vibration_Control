@@ -1,69 +1,225 @@
-function [d, T_p, residual] = IK_3SPR(Z, alpha, beta, p)
-% --------------------------------------------------
-% 3-SPR å¹¶è”æœºæ„é€†è¿åŠ¨å­¦
-% è¾“å…¥:
-%   Z, alpha, beta : åŠ¨å¹³å°è‡ªç”±åº¦ (2R1T)
-%   p : åŠ¨å¹³å°ä½ç½®å’Œå§¿æ€å‚æ•°ç»“æ„ä½“ï¼ŒåŒ…å«åŸºåº§ S å‰¯ä¸­å¿ƒå’Œå¹³å° R å‰¯ä¸­å¿ƒä¿¡æ¯
+
+function [d_sol, vars_sol_double, T_limb1_sol, T_limb2_sol, T_limb3_sol, info] = IK_3SPR(T_des, S1, S2, S3, T_01, x0, opts)
+%IK_3SPR 3SPR ²¢Áª»ú¹¹ÄæÔË¶¯Ñ§£¨Å£¶ÙÏÂÉ½·¨£º×èÄáÅ£¶Ù/LM + ÏßËÑË÷£©
 %
-% è¾“å‡º:
-%   d : 3x1 ä¸»åŠ¨ P å…³èŠ‚ä½ç§»
-%   T_p : åŠ¨å¹³å°ä½å§¿
-%   residual : çº¦æŸæ®‹å·®
-% --------------------------------------------------
-    A = {p.s1, p.s2, p.s3};   % åŸºåº§ç‚¹
-    B = {p.b1, p.b2, p.b3};   % å¹³å°ç‚¹
-    %% 1. æ„é€ æ—‹è½¬çŸ©é˜µï¼ˆæ— ç»• Z è½´ï¼‰
-    Rx = [1 0 0;
-          0 cos(alpha) -sin(alpha);
-          0 sin(alpha)  cos(alpha)];
-      
-    Ry = [ cos(beta) 0 sin(beta);
-            0        1     0;
-          -sin(beta) 0 cos(beta)];
+% Ä¿±ê£ºÍ¬Ê±Ô¼Êø¡°Î»ÖÃ + ×ËÌ¬¡±ÓëÄ¿±êÎ»×ËÒ»ÖÂ¡£
+% ÊµÏÖ·½Ê½£º¹¹Ôì²Ğ²îÏòÁ¿ r(x)£¨18x1£©£º
+%   - ¶Ô 3 ÌõÖ§Á´£ºÎ»ÖÃ²Ğ²î p_i - p_des£¨¹² 9 ¸ö£©
+%   - ¶Ô 3 ÌõÖ§Á´£º×ËÌ¬²Ğ²îÓÃ R_rel = R_des^T * R_i µÄ·´¶Ô³Æ²¿·Ö£¨¹² 9 ¸ö£©
+%     È»ºó×îĞ¡»¯ f(x) = 1/2 * ||r(x)||^2¡£
+%
+% ÊäÈë:
+%   T_des : 4x4 Ä¿±êÆ½Ì¨Æë´Î±ä»»¾ØÕó£¨ÊÀ½çÏµ£©
+%   S1,S2,S3 : ÈıÌõÖ§Á´µÄÂİĞıÖá½á¹¹ÌåÊı×é
+%   T_01  : ÁãÎ»Æ½Ì¨Î»×Ë
+%   x0    : (¿ÉÑ¡) 15 Î¬³õÖµ£¨½¨ÒéÓÃÉÏÒ»Ö¡½â×ö warm start£©
+%   opts  : (¿ÉÑ¡) ½á¹¹Ìå
+%           .maxIter (Ä¬ÈÏ 50)
+%           .tolF    (Ä¬ÈÏ 1e-10)  % Ä¿±êº¯ÊıãĞÖµ
+%           .tolG    (Ä¬ÈÏ 1e-8)   % Ìİ¶ÈãĞÖµ
+%           .tolStep (Ä¬ÈÏ 1e-10)  % ²½³¤ãĞÖµ
+%           .fdEps   (Ä¬ÈÏ 1e-6)   % ÓĞÏŞ²î·Ö²½³¤
+%           .lambda0 (Ä¬ÈÏ 1e-3)   % ³õÊ¼×èÄá
+%           .verbose (Ä¬ÈÏ false)
+%
+% Êä³ö:
+%   d_sol          : 3x1 Ö÷¶¯¹Ø½Ú±äÁ¿ [d1; d2; d3]
+%   vars_sol_double: 15x1 È«²¿Î´ÖªÁ¿µÄÊıÖµ½â£¨Ë³Ğò¼ûÏÂ·½£©
+%   T_limb*_sol    : 4x4 ¸÷Ö§Á´Ä©¶ËÎ»×Ë
+%   info           : µü´úĞÅÏ¢
 
-    R = Rx * Ry; % Z-YX (2R1T) é¡ºåºæ—‹è½¬çŸ©é˜µ
-
-    %% 2. P å‰¯æ–¹å‘ï¼ˆ3SPR é€šå¸¸ç«–ç›´ï¼‰
-    ez = [0;0;1];
-
-    %% 3. æ±‚è§£ X,Yï¼ˆçº¿æ€§çº¦æŸï¼‰
-    M = [];
-    c = [];
-
-    for i = 1:3
-        bi = R * B{i};
-        Ai = A{i};
-
-        % çº¦æŸï¼šæ°´å¹³åˆ†é‡å¿…é¡»ç›¸ç­‰
-        M = [M;
-             1 0;
-             0 1];
-
-        c = [c;
-             Ai(1) - bi(1);
-             Ai(2) - bi(2)];
-    end
-
-    XY = M \ c;
-    X = XY(1);
-    Y = XY(2);
-
-    P = [X;Y;Z];
-
-    %% 4. è®¡ç®— P å‰¯ä½ç§»
-    d = zeros(3,1);
-    residual = 0;
-
-    for i = 1:3
-        bi = R * B{i};   % å¹³å°ç‚¹ï¼ˆè½¬åˆ°åŸºåº§ç³»ï¼‰
-        Ai = A{i};       % åŸºåº§ç‚¹
-        d(i) = ez' * (P + bi - Ai);
-        residual = residual + norm(P + bi - Ai - d(i)*ez);
-    end
-
-    residual = residual / 3;
-
-    %% 5. å¹³å°ä½å§¿
-    T_p = [R P;
-           0 0 0 1];
+if nargin < 5
+	error('IK_3SPR:NotEnoughInputs', 'ĞèÒªÊäÈë T_des, S1, S2, S3, T_01¡£');
 end
+if ~isequal(size(T_des), [4,4])
+	error('IK_3SPR:InvalidTdes', 'T_des ±ØĞëÊÇ 4x4 Æë´Î¾ØÕó¡£');
+end
+
+if nargin < 6 || isempty(x0)
+	x0 = zeros(1,15);
+end
+if nargin < 7
+	opts = struct();
+end
+
+% x = [Q1 Q3 Q4 Q5,  P1 P3 P4 P5,  R1 R3 R4 R5,  d1 d2 d3]
+x = x0(:);
+if numel(x) ~= 15
+	error('IK_3SPR:InvalidInitialGuess', 'x0 µÄ³¤¶È±ØĞëÎª 15¡£');
+end
+
+maxIter = get_opt(opts, 'maxIter', 50);
+tolF    = get_opt(opts, 'tolF',    1e-10);
+tolG    = get_opt(opts, 'tolG',    1e-8);
+tolStep = get_opt(opts, 'tolStep', 1e-10);
+fdEps   = get_opt(opts, 'fdEps',   1e-6);
+lambda  = get_opt(opts, 'lambda0', 1e-3);
+verbose = get_opt(opts, 'verbose', false);
+
+T_des = double(T_des);
+p_des = T_des(1:3,4);
+R_des = T_des(1:3,1:3);
+
+% ³õÊ¼²Ğ²î/Ä¿±êº¯Êı
+[r, T1, T2, T3] = residual_3spr(x, S1, S2, S3, T_01, p_des, R_des);
+f = 0.5 * (r.'*r);
+
+if verbose
+	fprintf('[IK] iter=%d, f=%.3e, ||r||=%.3e, lambda=%.3e\n', 0, f, norm(r), lambda);
+end
+
+exitflag = 0;
+iter = 0;
+
+for k = 1:maxIter
+	iter = k;
+	% ÓĞÏŞ²î·ÖÑÅ¿É±È J (18x15)
+	J = jacobian_fd(@(xx) residual_only(xx, S1, S2, S3, T_01, p_des, R_des), x, fdEps);
+
+	g = J.' * r; % Ìİ¶È£¨½üËÆ£©
+	if norm(g, inf) < tolG
+		exitflag = 1;
+		break;
+	end
+
+	% LM / ×èÄá¸ßË¹-Å£¶Ù²½
+	A = (J.'*J) + lambda * eye(15);
+	dx = -A \ g;
+
+	if norm(dx, inf) < tolStep
+		exitflag = 2;
+		break;
+	end
+
+	% »ØËİÏßËÑË÷£¨ÏÂÉ½£©
+	alpha = 1.0;
+	f0 = f;
+	% Armijo Ìõ¼ş£ºf(x+alpha*dx) <= f0 + c1*alpha*g'*dx
+	c1 = 1e-4;
+	gd = g.' * dx;
+	if gd > 0
+		% ÀíÂÛÉÏ dx Ó¦¸ÃÊÇÏÂ½µ·½Ïò£»Èô²»ÊÇ£¬Ôö´ó×èÄá²¢ÖØÀ´
+		lambda = lambda * 10;
+		continue;
+	end
+
+	accepted = false;
+	for ls = 1:20
+		x_try = x + alpha * dx;
+		[r_try, T1_try, T2_try, T3_try] = residual_3spr(x_try, S1, S2, S3, T_01, p_des, R_des);
+		f_try = 0.5 * (r_try.'*r_try);
+
+		if f_try <= f0 + c1 * alpha * gd
+			accepted = true;
+			x = x_try;
+			r = r_try;
+			f = f_try;
+			T1 = T1_try; T2 = T2_try; T3 = T3_try;
+			break;
+		end
+		alpha = alpha * 0.5;
+	end
+
+	if ~accepted
+		% ÏßËÑË÷Ê§°Ü£ºÔö´ó×èÄá£¬³¢ÊÔ¸ü±£ÊØµÄ²½
+		lambda = lambda * 10;
+	else
+		% Èô½ÓÊÜ²½£¬ÊÊµ±¼õĞ¡×èÄá£¬¼ÓËÙÊÕÁ²
+		lambda = max(lambda / 3, 1e-12);
+	end
+
+	if verbose
+		fprintf('[IK] iter=%d, f=%.3e, ||r||=%.3e, alpha=%.3g, lambda=%.3e\n', k, f, norm(r), alpha, lambda);
+	end
+
+	if f < tolF
+		exitflag = 3;
+		break;
+	end
+end
+
+vars_sol_double = x;
+d_sol = x(13:15);
+
+T_limb1_sol = T1;
+T_limb2_sol = T2;
+T_limb3_sol = T3;
+
+info.iter = iter;
+info.exitflag = exitflag;
+info.f = f;
+info.norm_r = norm(r);
+info.lambda = lambda;
+end
+
+function val = get_opt(opts, name, defaultVal)
+if isstruct(opts) && isfield(opts, name) && ~isempty(opts.(name))
+	val = opts.(name);
+else
+	val = defaultVal;
+end
+end
+%% ¸¨Öúº¯Êı
+function r = residual_only(x, S1, S2, S3, T_01, p_des, R_des)
+[r, ~, ~, ~] = residual_3spr(x, S1, S2, S3, T_01, p_des, R_des);
+end
+
+function [r, T1, T2, T3] = residual_3spr(x, S1, S2, S3, T_01, p_des, R_des)
+% ¸ù¾İµ±Ç°Î´ÖªÁ¿ x ¼ÆËã 18x1 ²Ğ²î
+% x = [Q1 Q3 Q4 Q5,  P1 P3 P4 P5,  R1 R3 R4 R5,  d1 d2 d3]
+
+Q1 = x(1);  Q3 = x(2);  Q4 = x(3);  Q5 = x(4);
+P1 = x(5);  P3 = x(6);  P4 = x(7);  P5 = x(8);
+R1v= x(9);  R3 = x(10); R4 = x(11); R5 = x(12);
+d1 = x(13); d2 = x(14); d3 = x(15);
+
+q1 = [Q1; d1; Q3; Q4; Q5];
+q2 = [P1; d2; P3; P4; P5];
+q3 = [R1v; d3; R3; R4; R5];
+
+[T1, ~] = branch_forward_kinematics(S1, q1, T_01);
+[T2, ~] = branch_forward_kinematics(S2, q2, T_01);
+[T3, ~] = branch_forward_kinematics(S3, q3, T_01);
+
+p1 = T1(1:3,4);
+p2 = T2(1:3,4);
+p3 = T3(1:3,4);
+
+R1m = T1(1:3,1:3);
+R2m = T2(1:3,1:3);
+R3m = T3(1:3,1:3);
+
+rp = [p1 - p_des; p2 - p_des; p3 - p_des];
+
+rr1 = rot_residual(R1m, R_des);
+rr2 = rot_residual(R2m, R_des);
+rr3 = rot_residual(R3m, R_des);
+rr = [rr1; rr2; rr3];
+
+r = [rp; rr];
+end
+%% ×ËÌ¬²Ğ²î¼ÆËã
+function rr = rot_residual(R_i, R_des)
+% ×ËÌ¬²Ğ²î£ºR_rel = R_des^T * R_i£»È¡·´¶Ô³Æ²¿·ÖµÄ 3 ¸ö¶ÀÁ¢·ÖÁ¿
+R_rel = R_des.' * R_i;
+rr = [R_rel(3,2) - R_rel(2,3);
+	  R_rel(1,3) - R_rel(3,1);
+	  R_rel(2,1) - R_rel(1,2)];
+end
+
+function J = jacobian_fd(fun, x, eps0)
+% ÓĞÏŞ²î·ÖÑÅ¿É±È£¨Ç°Ïò²î·Ö£©
+r0 = fun(x);
+m = numel(r0);
+n = numel(x);
+J = zeros(m, n);
+
+for j = 1:n
+	h = eps0 * (1 + abs(x(j)));
+	x1 = x;
+	x1(j) = x1(j) + h;
+	r1 = fun(x1);
+	J(:,j) = (r1 - r0) / h;
+end
+end
+

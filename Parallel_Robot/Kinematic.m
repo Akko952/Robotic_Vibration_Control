@@ -71,9 +71,9 @@ S1(4).nu =-vector_to_skew_symmetric(S1(4).s_hat)*S1(4).ri ;
 S1(4).xi=[S1(4).s_hat;...
     S1(4).nu];%旋转副的TWIST旋量
 
-    [s_hat_s15]=find_orthogonal_vectors_inition(S1(3).s_hat,S1(4).s_hat);
+    % [s_hat_s15]=find_orthogonal_vectors_inition(S1(3).s_hat,S1(4).s_hat);
 
-S1(5).i = 5; S1(5).s_hat = s_hat_s15; S1(5).ri =p.s1;
+S1(5).i = 5; S1(5).s_hat = find_orthogonal_vectors_inition(S1(3).s_hat,S1(4).s_hat); S1(5).ri =p.s1;
 S1(5).nu =-vector_to_skew_symmetric(S1(5).s_hat)*S1(5).ri ;
 S1(5).xi=[S1(5).s_hat;...
     S1(5).nu];%旋转副的旋量
@@ -111,9 +111,9 @@ S2(4).nu =-vector_to_skew_symmetric(S2(4).s_hat)*S2(4).ri ;
 S2(4).xi=[S2(4).s_hat;...
     S2(4).nu];%旋转副的TWIST旋量
 
-    [s_hat_S25]=find_orthogonal_vectors_inition(S2(3).s_hat,S2(4).s_hat);
+    %[s_hat_S25]=find_orthogonal_vectors_inition(S2(3).s_hat,S2(4).s_hat);
 
-S2(5).i = 5; S2(5).s_hat = s_hat_S25; S2(5).ri =p.s2;
+S2(5).i = 5; S2(5).s_hat = find_orthogonal_vectors_inition(S2(3).s_hat,S2(4).s_hat); S2(5).ri =p.s2;
 S2(5).nu =-vector_to_skew_symmetric(S2(5).s_hat)*S2(5).ri ;
 S2(5).xi=[S2(5).s_hat;...
     S2(5).nu];%旋转副的TWIST旋量
@@ -150,9 +150,9 @@ S3(4).nu =-vector_to_skew_symmetric(S3(4).s_hat)*S3(4).ri ;
 S3(4).xi=[S3(4).s_hat;...
     S3(4).nu];%旋转副的TWIST旋量
 
-    [s_hat_S35]=find_orthogonal_vectors_inition(S3(3).s_hat,S3(4).s_hat);
+    % [s_hat_S35]=find_orthogonal_vectors_inition(S3(3).s_hat,S3(4).s_hat);
 
-S3(5).i = 5; S3(5).s_hat = s_hat_S35; S3(5).ri =p.s3;
+S3(5).i = 5; S3(5).s_hat = find_orthogonal_vectors_inition(S3(3).s_hat,S3(4).s_hat); S3(5).ri =p.s3;
 S3(5).nu =-vector_to_skew_symmetric(S3(5).s_hat)*S3(5).ri ;
 S3(5).xi=[S3(5).s_hat;...
     S3(5).nu];%旋转副的TWIST旋量

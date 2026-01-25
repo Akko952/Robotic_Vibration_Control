@@ -2,9 +2,9 @@ function [T_branch, Ad_all] = branch_forward_kinematics(S_chain, q_values, T_0_h
     % branch_forward_kinematics 计算单条分支的正向运动学 (POE公式)
     %
     % 输入:
-    %   S_chain  : 结构体数组 (如 S1)，包含该分支所有关节的旋量信息
-    %   q_values : 向量，对应每个关节的运动量 [theta_r; d_p; theta_s1; theta_s2; theta_s3]
-    %   T_0_home : 机械臂在零位时的末端位姿 (通常是 T_01 )
+    %   S_chain  : 旋量结构体，包含该分支所有关节的旋量信息
+    %   q_values : 向量，对应每个关节的关节变量 [theta_r; d_p; theta_s1; theta_s2; theta_s3]
+    %   T_0_home : 零位位姿 
     %
     % 输出:
     %   T_branch : 当前关节变量下的末端齐次变换矩阵
@@ -17,17 +17,25 @@ function [T_branch, Ad_all] = branch_forward_kinematics(S_chain, q_values, T_0_h
         error('关节变量数量与旋量数量不匹配');
     end
 
-    % 累乘指数积: T = e^(xi1*q1) * ... * e^(xin*qn) * M
-    T_acc = eye(4);
+    % 类型跟随
+    use_sym = isa(q_values(1), 'sym');
 
-    % 预分配伴随矩阵输出: Ad_all(:,:,k) 对应第 k 步的 Ad(T_acc)
-    Ad_all = zeros(6, 6, num_joints);
+    % 累乘指数积
+    if use_sym
+        T_acc = sym(eye(4));
+        % 预分配伴随矩阵输出
+        Ad_all = sym(zeros(6, 6, num_joints));
+    else
+        T_acc = eye(4);
+        % 预分配伴随矩阵输出
+        Ad_all = zeros(6, 6, num_joints);
+    end
     
     for k = num_joints:-1:1
         % 获取第k个关节的旋量 xi (6x1)
         xi = S_chain(k).xi;
         theta = q_values(k);
-        Ad_all(:, :, k) = adjoint_transformation(T_acc);                % 记录当前累乘到此的伴随矩阵
+        Ad_all(:, :, k) = adjoint_transformation(T_acc);% 记录当前累乘到此的伴随矩阵
         % 计算指数映射并累乘
         T_acc = T_acc*trans_exp_screw(xi, theta) ;%顺序为：S==p==R
 
@@ -44,8 +52,14 @@ function Ad_T = adjoint_transformation(T)
     R = T(1:3, 1:3);
     p = T(1:3, 4);
     p_skew = vector_to_skew_symmetric(p);
-    
-    Ad_T = [R, zeros(3, 3); p_skew * R, R];
+
+    if isa(R, 'sym')
+        Z = sym(zeros(3, 3));
+    else
+        Z = zeros(3, 3);
+    end
+
+    Ad_T = [R, Z; p_skew * R, R];
 end
 %对应的变换
  % trans_exp_screw(S1(5).xi,0)*...
