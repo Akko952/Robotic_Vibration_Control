@@ -6,23 +6,22 @@ Kinematic;%初始化运动学参数
  L=5/(sqrt(3)/2);%初始时刻各个支链的长度
  d1=0;d2=0;d3=0;
  d0=[d1 d2 d3];
-a1=[0; d0(1); 0; 0; 0];%支链1的初始关节变量
-b1=[0; d0(2); 0; 0; 0];%支链2的初始关节变量
-c1=[0; d0(3); 0; 0; 0]; %支链3的初始关节变量
+a1=[0; 0; 0;d0(1);  0];%支链1的初始关节变量
+b1=[0;  0; 0;d0(2); 0];%支链2的初始关节变量
+c1=[0; 0; 0;d0(3);  0]; %支链3的初始关节变量
 %计算初始时支链的POE以及伴随变换矩阵
 [T_limb1_init, Ad_all_1, T_limb2_init, Ad_all_2, T_limb3_init, Ad_all_3]=cal_POE_and_AdjointT(S1,S2,S3,a1,b1,c1,T_01);%debug完全
 %求解出初始时刻的目标位姿
 %通过虚位移法求解初始时刻的无外力下的力雅可比
 
- [Jacobian_spctial_platform,R0]=cal_platform_jacobian_by_forceScrew(S1,S2,S3,p,T_01,L);%debug完全
+ [Jacobian_spctial_platform,R0]=cal_platform_jacobian_by_forceScrew(S1,S2,S3,p,T_01,L,d1,d2,d3);%debug完全，方法稍微有局限性
 
 %可以通过计算得到相关limb的空间雅可比
-[H_p,H_a,Ja1,Ja2,Ja3,g]=cal_limb_jacobian(S1,S2,S3,Ad_all_1,Ad_all_2,Ad_all_3);%debug完全，方法更具有普遍性，解得初始状态下的雅可比
-
+[H_p,H_a,Ja1,Ja2,Ja3,g,Jacobian_spctial_platform_by_limb,Jacobian_spctial_platform_active]=cal_limb_jacobian(S1,S2,S3,Ad_all_1,Ad_all_2,Ad_all_3);%debug完全，方法更具有普遍性，解得初始状态下的雅可比
 load workspace_montecarlo_3SPR_20000.mat
 %%
 % FK的模板
-% d1=0;d2=0;d3=0;%给定主动关节变量
+% d1=D(777,1);d2=D(777,2);d3=D(777,3);%给定主动关节变量
 % [vars_sol_double,T_limb1_sol, Ad_all_1_sol, T_limb2_sol, Ad_all_2_sol, T_limb3_sol, Ad_all_3_sol]=FK_3SPR(S1,S2,S3,d1,d2,d3,T_01);%求解目标位姿
 %   [S1_new, S2_new, S3_new, frame] =reflash_Kinematic(T_limb1_sol, p,T_12,T_13);
   %% 
@@ -35,6 +34,9 @@ load workspace_montecarlo_3SPR_20000.mat
 % 关节空间的轨迹规划
 % Generate_MovingGIF;
 %笛卡尔空间轨迹规划
+
+% XZ 平面正弦轨迹规划
+ Generate_CartesianSine_XZ;
 
 %%
 %常规MBD方法的计算方法
@@ -71,12 +73,12 @@ load workspace_montecarlo_3SPR_20000.mat
 % dot_Phi_3=
 %%
 % 求解数值雅可比矩阵
-% d1=D(1,1);d2=D(1,2);d3=D(1,3);%给定主动关节变量
-% [vars_sol_double,T_limb1_sol, Ad_all_1_sol, T_limb2_sol, Ad_all_2_sol, T_limb3_sol, Ad_all_3_sol]=FK_3SPR(S1,S2,S3,d1,d2,d3,T_01);%求解目标位姿
-% [S1_new, S2_new, S3_new, frame] =reflash_Kinematic(T_limb1_sol, p,T_12,T_13)
-% [H_p_sol,H_a_sol,Ja1_sol,Ja2_sol,Ja3_sol,g_sol]=cal_limb_jacobian(S1_new,S2_new,S3_new,Ad_all_1_sol,Ad_all_2_sol,Ad_all_3_sol);
-% R_sol_Hp=rank(H_p_sol);
-% R_sol_H=rank([H_a_sol,H_p_sol]);
+d1=D(777,1);d2=D(777,2);d3=D(777,3);%给定主动关节变量
+[vars_sol_double,T_limb1_sol, Ad_all_1_sol, T_limb2_sol, Ad_all_2_sol, T_limb3_sol, Ad_all_3_sol]=FK_3SPR(S1,S2,S3,d1,d2,d3,T_01);%求解目标位姿
+[S1_new, S2_new, S3_new, frame] =reflash_Kinematic(T_limb1_sol, p,T_12,T_13);
+[H_p_sol,H_a_sol,Ja1_sol,Ja2_sol,Ja3_sol,g_sol,Jacobian_spctial_platform_by_limb_sol,Jacobian_spctial_platform_active_sol]=cal_limb_jacobian(S1_new,S2_new,S3_new,Ad_all_1_sol,Ad_all_2_sol,Ad_all_3_sol);
+[Jacobian_spctial_platform_sol,R0_sol]=cal_platform_jacobian_by_forceScrew(S1_new,S2_new,S3_new,p,T_01,L,d1,d2,d3);%计算目标位姿下的雅可比矩阵
+
 %% 给定矩阵
 T_des = [ ...
   0.9890   -0.0270    0.1451   -0.9778; ...
@@ -87,10 +89,10 @@ T_des = [ ...
 x0 = zeros(1,15); 
 try
   opts = struct();
-  opts.verbose = true;   % 打印每次迭代信息（不想刷屏就改成 false）
+  opts.verbose = true;   % 打印每次迭代信息
   opts.maxIter = 80;     % 最大迭代次数
-  % opts.lambda0 = 1e-3; % 初始阻尼（可选）
-  % opts.fdEps   = 1e-6; % 有限差分步长（可选）
+  % opts.lambda0 = 1e-3; % 初始阻尼
+  % opts.fdEps   = 1e-6; % 有限差分步长
 
   [d_sol, x_sol, T1_sol, T2_sol, T3_sol, info] = IK_3SPR(T_des, S1, S2, S3, T_01, x0, opts);
   fprintf('IK 求解成功：d = [%.6f  %.6f  %.6f]\n', d_sol(1), d_sol(2), d_sol(3));

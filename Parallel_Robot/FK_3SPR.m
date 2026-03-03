@@ -1,12 +1,12 @@
 function [vars_sol_double,T_limb1_sol, Ad_all_1_sol, T_limb2_sol, Ad_all_2_sol, T_limb3_sol, Ad_all_3_sol] = FK_3SPR(S1,S2,S3,d1, d2, d3,T_01, x0)
-syms Q1  Q3 Q4 Q5
-syms P1  P3 P4 P5
-syms R1  R3 R4 R5
+syms Q1  Q3 Q2 Q5
+syms P1  P3 P2 P5
+syms R1  R3 R2 R5
 
 %计算目标下的POE，由此得到开环Limb的T_s以及伴随矩阵
-[T_limb1_des, Ad_all_1_des]=branch_forward_kinematics(S1,[Q1; d1; Q3; Q4; Q5],T_01);%目标时刻末端位姿
-[T_limb2_des, Ad_all_2_des]=branch_forward_kinematics(S2,[P1; d2; P3; P4; P5],T_01);%目标时刻末端位姿
-[T_limb3_des, Ad_all_3_des]=branch_forward_kinematics(S3,[R1; d3; R3; R4; R5],T_01);%目标时刻末端位姿
+[T_limb1_des, Ad_all_1_des]=branch_forward_kinematics(S1,[Q1; Q2; Q3; d1; Q5],T_01);%目标时刻末端位姿
+[T_limb2_des, Ad_all_2_des]=branch_forward_kinematics(S2,[P1; P2; P3; d2; P5],T_01);%目标时刻末端位姿
+[T_limb3_des, Ad_all_3_des]=branch_forward_kinematics(S3,[R1; R2; R3; d3; R5],T_01);%目标时刻末端位姿
 p1_des=T_limb1_des(1:3,4);
 p2_des=T_limb2_des(1:3,4);
 p3_des=T_limb3_des(1:3,4);
@@ -37,7 +37,7 @@ eq_rot23 = [R_diff23(3,2) - R_diff23(2,3);
 eqs = [eqs_p; eq_rot12; eq_rot23];
 
 %% 求解方程组（零位作为初值）
-vars = [Q1 Q3 Q4 Q5  P1 P3 P4 P5  R1 R3 R4 R5];
+vars = [Q1 Q2 Q3 Q5  P1 P2 P3 P5  R1 R2 R3 R5];
 
 if nargin < 8 || isempty(x0)
   x0 = zeros(size(vars));
@@ -57,13 +57,13 @@ if isempty(fieldnames(S_sol))
   error('vpasolve 未收敛：请尝试更换初值/给定范围，或检查方程是否一致。');
 end
 
-vars_sol = [S_sol.Q1; S_sol.Q3; S_sol.Q4; S_sol.Q5; ...
-      S_sol.P1; S_sol.P3; S_sol.P4; S_sol.P5; ...
-      S_sol.R1; S_sol.R3; S_sol.R4; S_sol.R5];
+vars_sol = [S_sol.Q1; S_sol.Q2; S_sol.Q3; S_sol.Q5; ...
+      S_sol.P1; S_sol.P2; S_sol.P3; S_sol.P5; ...
+      S_sol.R1; S_sol.R2; S_sol.R3; S_sol.R5];
 
 vars_sol_double = double(vars_sol);
 %计算求解出后的T_limb
-[T_limb1_sol, Ad_all_1_sol]=branch_forward_kinematics(S1,[vars_sol_double(1); d1; vars_sol_double(2); vars_sol_double(3); vars_sol_double(4)],T_01);%目标时刻末端位姿
-[T_limb2_sol, Ad_all_2_sol]=branch_forward_kinematics(S2,[vars_sol_double(5); d2; vars_sol_double(6); vars_sol_double(7); vars_sol_double(8)],T_01);%目标时刻末端位姿
-[T_limb3_sol, Ad_all_3_sol]=branch_forward_kinematics(S3,[vars_sol_double(9); d3; vars_sol_double(10); vars_sol_double(11); vars_sol_double(12)],T_01);%目标时刻末端位姿
+[T_limb1_sol, Ad_all_1_sol]=branch_forward_kinematics(S1,[vars_sol_double(1); vars_sol_double(2); vars_sol_double(3); d1; vars_sol_double(4)],T_01);%目标时刻末端位姿
+[T_limb2_sol, Ad_all_2_sol]=branch_forward_kinematics(S2,[vars_sol_double(5); vars_sol_double(6); vars_sol_double(7); d2; vars_sol_double(8)],T_01);%目标时刻末端位姿
+[T_limb3_sol, Ad_all_3_sol]=branch_forward_kinematics(S3,[vars_sol_double(9); vars_sol_double(10); vars_sol_double(11); d3; vars_sol_double(12)],T_01);%目标时刻末端位姿
 end

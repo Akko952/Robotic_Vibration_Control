@@ -31,13 +31,13 @@ function [T_branch, Ad_all] = branch_forward_kinematics(S_chain, q_values, T_0_h
         Ad_all = zeros(6, 6, num_joints);
     end
     
-    for k = num_joints:-1:1
+    for k = 1:1:num_joints
         % 获取第k个关节的旋量 xi (6x1)
         xi = S_chain(k).xi;
         theta = q_values(k);
         Ad_all(:, :, k) = adjoint_transformation(T_acc);% 记录当前累乘到此的伴随矩阵
         % 计算指数映射并累乘
-        T_acc = T_acc*trans_exp_screw(xi, theta) ;%顺序为：S==p==R
+        T_acc = trans_exp_screw(xi, theta) * T_acc;%顺序为：S==p==R
 
 
     end

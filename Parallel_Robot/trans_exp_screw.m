@@ -29,7 +29,7 @@ function T = trans_exp_screw(xi, theta)
         % 平移部分：p = (Iθ + (1-cosθ)ω̂ + (θ-sinθ)ω̂²) * v
         % v = -ω × q，是旋量的线速度部分
         
-        % 方法1：直接使用公式
+        % 直接使用公式
         G_theta = eye(3) * theta_actual + ...
                   (1 - cos(theta_actual)) * omega_hat + ...
                   (theta_actual - sin(theta_actual)) * (omega_hat * omega_hat);
