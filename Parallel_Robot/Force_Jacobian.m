@@ -9,7 +9,7 @@ n_limb=S_limb(4).s_hat; %力作用点的线速度部分
 %力作用点的位置向量
 %    q_limb= transform_Point_vector(T_01, q_limb);
 %q_limb已经是固定坐标系下的描述
-m_limb= cross(S_limb(3).ri,n_limb ); %力作用点的力矩旋量部分
+m_limb= cross(q_limb,n_limb ); %力作用点的力矩旋量部分
 F_s=[%力矩旋量
 m_limb;
 %力旋量

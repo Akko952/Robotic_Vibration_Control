@@ -35,5 +35,5 @@ H_a=[Jacobian_spctial_platform_by_limb(:,4),Jacobian_spctial_platform_by_limb(:,
  R0a2=rank(Ja2);
 Ja3=Js_3*[g(9:11,:);[0,0,1];g(12,:)];
 R0a3=rank(Ja3);
- Jacobian_spctial_platform_active=[Js_1,Js_2,Js_3]*[g(1:3,:);[1,0,0];g(4,:);g(5:7,:);[0,1,0];g(8,:);g(9:11,:);[0,0,1];g(12,:)]/3;
+ Jacobian_spctial_platform_active=[[Js14,Js24,Js34]+[Js11,Js12,Js13,Js15,Js21,Js22,Js23,Js25,Js31,Js32,Js33,Js35]*g]/3;%平台主动雅可比矩阵
 end

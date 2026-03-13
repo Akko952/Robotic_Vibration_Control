@@ -1,9 +1,9 @@
 function [Jacobian_spctial_platform,R0]=cal_platform_jacobian_by_forceScrew(S1_in,S2_in,S3_in,p,T_01,L,d1,d2,d3)
 %计算动平台的运动学雅可比矩阵，通过力雅可比的方法
 %设定力的作用点相对于固定坐标系的位置
-q1 = p.s1+(L+d1)*S1_in(2).s_hat;
-p1 = p.s2+(L+d2)*S2_in(2).s_hat; 
-r1 = p.s3+(L+d3)*S3_in(2).s_hat; %真实的空间位置
+q1 = p.s1+(L+d1)*S1_in(4).s_hat;
+p1 = p.s2+(L+d2)*S2_in(4).s_hat; 
+r1 = p.s3+(L+d3)*S3_in(4).s_hat; %真实的空间位置
 %计算初始时刻的雅可比，利用力雅可比
 %如果去除所有的外力，则动平台受到的力为三个Limb传递的力
 %对于limb来说，这个力以S副为起点，指向R副，也就是P的方向
